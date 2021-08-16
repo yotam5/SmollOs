@@ -10,7 +10,7 @@ struct idtr_desc idtr_descriptor;
 
 extern void idt_load(struct idtr_desc *ptr);
 extern void int21h();
-extern void no_interrupt_handler();
+extern void no_interrupt();
 
 void int21h_handler() 
 { 
@@ -38,7 +38,7 @@ void idt_init() {
   idtr_descriptor.limit = sizeof(idt_descriptors) - 1;
   idtr_descriptor.base = (uint32_t)idt_descriptors;
   for(int i=0;i<SmollOs_TOTAL_INTERRUPTS;i++){
-  	idt_set(i,no_interrupt_handler);
+  	idt_set(i,no_interrupt);
   }
   idt_set(0, idt_zero);
   idt_set(0x21, int21h);

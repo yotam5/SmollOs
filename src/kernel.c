@@ -8,6 +8,7 @@ uint16_t* video_mem = 0;
 uint16_t terminal_row = 0;
 uint16_t terminal_col = 0;
 
+
 //takes char and color and return uint16 of that
 uint16_t terminal_make_char(char c, char colour)
 {
@@ -74,5 +75,6 @@ void kernel_main()
 	terminal_initialize();
 	print("hello\nworld");
 	idt_init();
-	
+	enable_interrupts();
+	//outb(0x60, 0xff);
 }
