@@ -19,6 +19,20 @@ _start:
 	in al, 0x92
 	or al,2
 	out 0x92, al
+
+	;remap the master PIC
+	mov al,00010001b
+	out 0x20, al ;tell master PIC
+
+	mov al, 0x20 ;interrupt 0x20 ISR
+	out 0x21, al
+
+	mov al,00000001b
+	out 0x21, al
+
+	;end remap the master PIC
+	sti
+	
 	call kernel_main
 	jmp $
 
