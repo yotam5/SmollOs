@@ -6,5 +6,5 @@
 
 void kernel_start();
 void print(const char* str);
-
+void kheap_init();
 #endif

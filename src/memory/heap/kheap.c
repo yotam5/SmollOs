@@ -12,10 +12,14 @@ void kheap_init()
 	kernel_heap_table.entries = (HEAP_BLOCK_TABLE_ENTRY*)(SmollOs_HEAP_TABLE_ADDRESS);
 	kernel_heap_table.total = total_table_entries;
 
-	void *end = (void*)(SmollOs_HEAP_TABLE_ADDRESS + SmollOs_HEAP_SIZE_BYTES);
-	int res = heap_create(&kernel_heap,(void*)SmollOs_HEAP_TABLE_ADDRESS, end,&kernel_heap_table);
+	void *end = (void*)(SmollOs_HEAP_ADDRESS + SmollOs_HEAP_SIZE_BYTES);
+	int res = heap_create(&kernel_heap,(void*)(SmollOs_HEAP_ADDRESS), end,&kernel_heap_table);
 
 	if(res < 0){
 		print("failed to to create heap\n");
 	}
+}
+
+void *kmalloc(size_t size){
+	return heap_malloc(&kernel_heap,size);
 }

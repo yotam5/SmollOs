@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include "./idt/idt.h"
 #include "./io/io.h"
+#include  "./memory/heap/kheap.h"
 
 uint16_t* video_mem = 0;
 uint16_t terminal_row = 0;
@@ -61,6 +62,7 @@ size_t strlen(const char * str)
 	return len;
 }
 
+//print string to the screen
 void print(const char* str)
 {
 	size_t len = strlen(str);
@@ -74,7 +76,10 @@ void kernel_main()
 {
 	terminal_initialize();
 	print("hello\nworld");
+	kheap_init();
 	idt_init();
 	enable_interrupts();
+	void* ptr1 = kmalloc(50);
+	if(ptr1){}
 	//outb(0x60, 0xff);
 }

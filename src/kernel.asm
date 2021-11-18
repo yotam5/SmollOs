@@ -19,6 +19,7 @@ _start:
 	or al,2
 	out 0x92, al
 
+	;remap master PIC
 	mov al,00010001b
 	out 0x20,al
 	out 0xA0,al
