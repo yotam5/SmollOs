@@ -79,7 +79,9 @@ void kernel_main()
 	kheap_init();
 	idt_init();
 	enable_interrupts();
-	void* ptr1 = kmalloc(50);
-	if(ptr1){}
+	//void* ptr1 = kmalloc(50);
+	//void* ptr2 = kmalloc(100);
+	//kfree(ptr2);
+	//if(ptr1 || ptr2){}
 	//outb(0x60, 0xff);
 }

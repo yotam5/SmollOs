@@ -30,4 +30,5 @@ void* heap_malloc(struct heap *heap,size_t size);
 void heap_free(struct heap* heap,void* ptr);
 void heap_mark_blocks_taken(struct heap* heap, int start_block,int total_blocks);
 int heap_get_start_block(struct heap* heap,uint32_t total_blocks);
+void heap_free(struct heap* heap,void* ptr);
 #endif

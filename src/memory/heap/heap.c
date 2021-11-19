@@ -55,7 +55,7 @@ static uint32_t heap_align_value_to_upper(uint32_t val){
 	return val;
 }
 
-//
+//allocate blocks on the heap and mark them for usage
 void* heap_malloc_blocks(struct heap* heap, uint32_t total_blocks){
 	void* address = 0;
 
@@ -133,5 +133,23 @@ void* heap_malloc(struct heap *heap,size_t size){
 	return heap_malloc_blocks(heap,total_heap_blocks);
 }
 
+//return the block of an heap address
+int heap_address_to_block(struct heap* heap,void* address){
+	return ((long)(address - heap->saddr)) / SmollOs_HEAP_BLOCK_SIZE;
+}
+
+//mark blocks as free in the heap/release blocks
+void heap_mark_blocks_free(struct heap* heap, int starting_block){
+	struct heap_table* table = heap->table;
+	for(int i = starting_block; i < (int)(table->total);i++){
+		HEAP_BLOCK_TABLE_ENTRY entry = table->entries[i];
+		table->entries[i] = HEAP_BLOCK_TABLE_ENTRY_FREE;
+		if(!(entry & HEAP_BLOCK_HAS_NEXT)){
+			break;
+		}
+	}
+}
+
 void heap_free(struct heap* heap,void* ptr){
+	heap_mark_blocks_free(heap,heap_address_to_block(heap,ptr));
 }
