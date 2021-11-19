@@ -55,6 +55,7 @@ static uint32_t heap_align_value_to_upper(uint32_t val){
 	return val;
 }
 
+//
 void* heap_malloc_blocks(struct heap* heap, uint32_t total_blocks){
 	void* address = 0;
 
@@ -71,12 +72,12 @@ out:
 	return address;
 }
 
+//mark block in the heap that are taken/used
 void heap_mark_blocks_taken(struct heap* heap, int start_block,int total_blocks){
 	int end_block = start_block + total_blocks - 1;
 	HEAP_BLOCK_TABLE_ENTRY entry = HEAP_BLOCK_TABLE_ENTRY_TAKEN | HEAP_BLOCK_IS_FIRST;
 	if(total_blocks > 1){
 		entry |= HEAP_BLOCK_HAS_NEXT;
-
 	}
 	for(int i= start_block;i<= end_block;i++){
 		heap->table->entries[i] = entry;
@@ -87,14 +88,17 @@ void heap_mark_blocks_taken(struct heap* heap, int start_block,int total_blocks)
 	}
 }
 
+//get the entry type of a block in the heap
 static int heap_get_entry_type(HEAP_BLOCK_TABLE_ENTRY entry){
 	return entry & 0x0f; //extract entry type
 }
 
+//return the address of block n
 void* heap_block_to_address(struct heap* heap, int block){
 	return heap->saddr + (block*SmollOs_HEAP_BLOCK_SIZE);
 }
 
+//return the start block in heap for n blocks
 int heap_get_start_block(struct heap* heap,uint32_t total_blocks){
 	struct heap_table* table = heap->table;
 	int bc = 0; //current block
@@ -121,6 +125,8 @@ int heap_get_start_block(struct heap* heap,uint32_t total_blocks){
 	}
 	return bs;
 }
+
+//allocate memory on the heap 
 void* heap_malloc(struct heap *heap,size_t size){
 	size_t algined_size = heap_align_value_to_upper(size);
 	uint32_t total_heap_blocks = algined_size / SmollOs_HEAP_BLOCK_SIZE;
