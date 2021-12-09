@@ -85,8 +85,14 @@ void kernel_main()
 	//void* ptr2 = kmalloc(100);
 	//kfree(ptr2);
 	//if(ptr1 || ptr2){}
+	//set up paging
 	kernel_chunk = paging_new_4gb(
 		PAGING_IS_WRITABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+
+	//switch to kernel paging chunk
+	paging_switch(paging_4gb_chunk_get_directory(kernel_chunk));
+
+	enable_paging();
 	enable_interrupts();
 
 	//outb(0x60, 0xff);

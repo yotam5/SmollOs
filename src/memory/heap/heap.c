@@ -150,6 +150,7 @@ void heap_mark_blocks_free(struct heap* heap, int starting_block){
 	}
 }
 
+//released usef blocks on the heap
 void heap_free(struct heap* heap,void* ptr){
 	heap_mark_blocks_free(heap,heap_address_to_block(heap,ptr));
 }

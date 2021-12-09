@@ -28,7 +28,7 @@ void *kmalloc(size_t size){
 	return heap_malloc(&kernel_heap,size);
 }
 
-//
+//allocate memroy and clean it on the heap
 void *kzalloc(size_t size){
 	void* ptr = kmalloc(size);
 	if(!ptr){
