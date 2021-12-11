@@ -2,7 +2,7 @@
 #include "paging.h"
 #include "../heap/kheap.h"
 #include "../../status.h"
-
+void print(const char* str);
 static uint32_t* current_directory = 0;
 void paging_load_directory(uint32_t* directory);
 
@@ -40,30 +40,35 @@ bool paging_is_aligned(void *addr){
 
 //resolve address to directory entry and table address
 int paging_get_indexes(void* virtual_address, uint32_t *directory_index_out,
-    uint32_t* table_index_out){
-        int res = 0;
-        if(!paging_is_aligned(virtual_address)){
-            res = -EINVARG;
-            goto out;
-        }
-    *directory_index_out = ((uint32_t))virtual_address)/(PAGING_TOTAL_ENTRIES_PER_TABLE * PAGING_PAGE_SIZE);
-    *table_index_out = ((uint32_t)virtual_address)/(PAGING_TOTAL_ENTRIES_PER_TABLE*PAGING_PAGE_SIZE)/PAGING_PAGE_SIZE;
-    out:
+    uint32_t* table_index_out)
+{
+    int res = 0;
+    if(!paging_is_aligned(virtual_address)){
+        print("paging is not align"); 
+        res = -EINVARG;
+        goto out;
+    }
+    *directory_index_out = ((uint32_t)virtual_address / (PAGING_TOTAL_ENTRIES_PER_TABLE * PAGING_PAGE_SIZE));
+    *table_index_out = ((uint32_t)virtual_address % (PAGING_TOTAL_ENTRIES_PER_TABLE * PAGING_PAGE_SIZE) / PAGING_PAGE_SIZE);    out:
     return res;
 }
 
 int paging_set(uint32_t *directory, void* virt,uint32_t val)
 {
+    print("\nenter paging set\n");
     if(!paging_is_aligned(virt)){
+        print("paging error");
         return -EINVARG;
     }
     uint32_t directory_index = 0;
     uint32_t table_index = 0;
     int res = paging_get_indexes(virt,&directory_index,&table_index);
     if(res < 0){
+        print("res error");
         return res;
     }
     uint32_t entry = directory[directory_index];
-    uint32_t* table = (uint32_t*)(entry & 0xffff000);
+    uint32_t* table = (uint32_t*)(entry & 0xfffff000);
     table[table_index] = val;
+    return 0;
 }
