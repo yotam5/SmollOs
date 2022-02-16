@@ -8,5 +8,5 @@
 #define SmollOs_HEAP_TABLE_ADDRESS 0x00007E00 
 #define KERNEL_CODE_SELECTOR 0x08
 #define KERNEL_DATA_SELECTOR 0x10
-
+#define SmollOs_SECTOR_SIZE 512
 #endif

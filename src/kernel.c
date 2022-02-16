@@ -3,6 +3,7 @@
 #include "./io/io.h"
 #include "./memory/heap/kheap.h"
 #include "./memory/paging/paging.h"
+#include "disk/disk.h"
 #include <stddef.h>
 #include <stdint.h>
 
@@ -85,11 +86,9 @@ void kernel_main() {
                  PAGING_IS_WRITABLE);
 				 
   enable_paging();
-  char *ptr2 = (char*)0x1000;
-  ptr2[0] = 'A';
-  ptr2[1] = 'B';
-  print(ptr2);
-  print(ptr);
+
+  disk_get(0);
+
   enable_interrupts();
 
   // outb(0x60, 0xff);
