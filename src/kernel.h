@@ -3,6 +3,7 @@
 
 #define VGA_WIDTH 80
 #define VGA_HEIGHT 20
+#define SmollOs_MAX_PATH 108
 
 void kernel_start();
 void print(const char* str);
