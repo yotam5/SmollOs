@@ -6,7 +6,7 @@ int strlen(const char *ptr)
     int i = 0;
     while(*ptr != 0){
         i++;
-        ptr++;
+        ptr+=1;
     }
     return i;
 }
@@ -18,15 +18,16 @@ bool isdigit(char c)
 
 int tonummericdigit(char c)
 {
-    return  - 48;
+    return c - 48;
 }
 
 int strnlen(const char *ptr,int max)
 {
     int i = 0;
-    while(i < max &&*ptr != 0)
-    {
-        i++;
+    for(i=0;i<max;i++){
+        if(ptr[i] == 0){
+            break;
+        }
     }
     return i;
 }
