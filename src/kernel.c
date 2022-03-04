@@ -8,6 +8,7 @@
 #include "./string/string.h"
 #include <stddef.h>
 #include <stdint.h>
+#include "./disk/streamer.h"
 
 uint16_t *video_mem = 0;
 uint16_t terminal_row = 0;
@@ -85,10 +86,16 @@ void kernel_main() {
   disk_get(0);
 
   enable_interrupts();
-  struct path_root* root_path = pathparser_parse("0:/bin/shell.exe",NULL);
+  /*struct path_root* root_path = pathparser_parse("0:/bin/shell.exe",NULL);
   if(root_path)
   {
 
-  }
+  }*/
+  struct disk_stream* stream = diskstreamer_new(0);
+  diskstreamer_seek(stream,0x201);
+  unsigned char c = 0;
+  diskstreamer_read(stream, &c, 1);
+  while(1)
+  {}
   // outb(0x60, 0xff);
 }
