@@ -6,13 +6,18 @@
 #include "disk/disk.h"
 #include "./fs/pparser.h"
 #include "./string/string.h"
+#include <bits/types.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <sys/types.h>
 #include "./disk/streamer.h"
 
 uint16_t *video_mem = 0;
 uint16_t terminal_row = 0;
 uint16_t terminal_col = 0;
+
+  // read a value from the data port
+  
 
 // takes char and color and return uint16 of that
 uint16_t terminal_make_char(char c, char colour) { return (colour << 8) | c; }

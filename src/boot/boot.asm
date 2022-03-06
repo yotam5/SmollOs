@@ -7,6 +7,13 @@ DATA_SEG equ gdt_data - gdt_start
 jmp short start
 nop
 
+;FAT16 Header
+OEMIdentifier       db 'SmollOs '
+BytesPerSector      dw 0x200
+SectorPerCluster    db 0x80
+ReservedSectors     dw 200
+
+
 start:
     jmp 0:step2
 
