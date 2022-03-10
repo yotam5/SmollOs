@@ -6,10 +6,8 @@
 #include "disk/disk.h"
 #include "./fs/pparser.h"
 #include "./string/string.h"
-#include <bits/types.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <sys/types.h>
 #include "./disk/streamer.h"
 
 uint16_t *video_mem = 0;
