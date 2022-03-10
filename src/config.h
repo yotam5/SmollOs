@@ -9,4 +9,7 @@
 #define KERNEL_CODE_SELECTOR 0x08
 #define KERNEL_DATA_SELECTOR 0x10
 #define SmollOs_SECTOR_SIZE 512
+#define SmollOs_MAX_FILE_SYSTEMS 12
+#define SmollOs_MAX_FILE_DESCRIPTORS 512
+
 #endif

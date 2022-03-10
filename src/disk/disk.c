@@ -37,6 +37,7 @@ void disk_search_and_init()
 	memset(&disk, 0, sizeof(disk));
 	disk.type = SMOLLOS_DISK_TYPE_REAL;
 	disk.sector_size = SmollOs_SECTOR_SIZE;
+	disk.filesystem = fs_resolve(&disk);
 }
 
 struct disk* disk_get(int index)
