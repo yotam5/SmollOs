@@ -96,12 +96,16 @@ void kernel_main() {
   {
 
   }*/
-  struct disk_stream* stream = diskstreamer_new(0);
+  /*struct disk_stream* stream = diskstreamer_new(0);
   diskstreamer_seek(stream,0x201);
   unsigned char c = 0;
-  diskstreamer_read(stream, &c, 1);
-  char buff[20];
-  strcpy(buff,"hello!");
+  diskstreamer_read(stream, &c, 1);*/
+
   // outb(0x60, 0xff);
+  int fd = fopen("0:/hello.txt","r");
+  if(fd)
+  {
+    print("we opened hello.txt\n");
+  }
   while(1){}
 }

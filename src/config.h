@@ -11,5 +11,6 @@
 #define SmollOs_SECTOR_SIZE 512
 #define SmollOs_MAX_FILE_SYSTEMS 12
 #define SmollOs_MAX_FILE_DESCRIPTORS 512
+#define SmollOs_MAX_PATH 108
 
 #endif
