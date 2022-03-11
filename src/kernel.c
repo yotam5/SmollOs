@@ -5,10 +5,10 @@
 #include "./memory/paging/paging.h"
 #include "disk/disk.h"
 #include "./fs/pparser.h"
-#include "./string/string.h"
 #include <stddef.h>
 #include <stdint.h>
 #include "./disk/streamer.h"
+#include "./string/string.h"
 
 uint16_t *video_mem = 0;
 uint16_t terminal_row = 0;
@@ -66,6 +66,8 @@ void kernel_main() {
   terminal_initialize();
   print("hello\nworld");
   kheap_init();
+  fs_init();
+  disk_search_and_init();
   idt_init();
 
   // void* ptr1 = kmalloc(50);
@@ -98,7 +100,8 @@ void kernel_main() {
   diskstreamer_seek(stream,0x201);
   unsigned char c = 0;
   diskstreamer_read(stream, &c, 1);
-  while(1)
-  {}
+  char buff[20];
+  strcpy(buff,"hello!");
   // outb(0x60, 0xff);
+  while(1){}
 }
