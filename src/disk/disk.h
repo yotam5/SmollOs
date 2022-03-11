@@ -8,7 +8,9 @@ struct disk
 {
     SMOLLOS_DISK_TYPE type;
     int sector_size;
+    int id;
     struct filesystem* filesystem;
+    void* fs_private;
 };
 
 //int disk_read_sector(int lba, int total, void *buf);
