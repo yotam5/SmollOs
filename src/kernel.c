@@ -1,5 +1,6 @@
 #include "kernel.h"
 #include "./idt/idt.h"
+#include "./memory/memory.h"
 #include "./io/io.h"
 #include "./memory/heap/kheap.h"
 #include "./memory/paging/paging.h"
@@ -9,6 +10,8 @@
 #include <stdint.h>
 #include "./disk/streamer.h"
 #include "./string/string.h"
+#include "./gdt/gdt.h"
+#include "./config.h"
 
 uint16_t *video_mem = 0;
 uint16_t terminal_row = 0;
@@ -62,9 +65,28 @@ void print(const char *str) {
 }
 
 static struct paging_4g_chunk *kernel_chunk = 0;
+
+void panic(const char* msg)
+{
+  print(msg);
+  while(1){}
+}
+
+
+struct gdt gdt_real[SmollOs_TOTAL_GDT_SEGMENTS];
+struct gdt_structured gdt_structured[SmollOs_TOTAL_GDT_SEGMENTS] = 
+{
+  {.base = 0x00, .limit = 0x00, .type = 0x00},      //null segment
+  {.base = 0x00, .limit = 0xffffffff, .type = 0x9a},  //kernel code segment
+  {.base = 0x00, .limit = 0xffffffff, .type = 0x92} //kernel data segment
+};
+
 void kernel_main() {
   terminal_initialize();
   print("hello\nworld");
+  memset(gdt_real,0x00,sizeof(gdt_real));
+  gdt_structured_to_gdt(gdt_real, gdt_structured, SmollOs_TOTAL_GDT_SEGMENTS);
+  gdt_load(gdt_real,sizeof(gdt_real));
   kheap_init();
   fs_init();
   disk_search_and_init();
@@ -102,10 +124,14 @@ void kernel_main() {
   diskstreamer_read(stream, &c, 1);*/
 
   // outb(0x60, 0xff);
-  int fd = fopen("0:/hello.txt","r");
+      //struct file_stat s;
+    print("booted");
+  /*int fd = fopen("0:/hello.txt","r");
   if(fd)
   {
-    print("we opened hello.txt\n");
-  }
+    fstat(fd,&s);
+    fclose(fd);
+    print("work");
+  }*/
   while(1){}
 }

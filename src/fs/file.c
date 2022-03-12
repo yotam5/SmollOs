@@ -167,3 +167,72 @@ int fopen(const char* filename, const char* mode_str)
     }
     return res;
 }
+
+int fstat(int fd, struct file_stat* stat)
+{
+    int res = 0;
+    struct file_descriptor* desc = file_get_descriptor(fd);
+    if(!desc){
+        res = -EIO;
+        goto out;
+    }
+    res = desc->filesystem->stat(desc->disk,desc->_private,stat);
+    out:
+    return res;
+}
+
+int fseek(int fd, int offset, FILE_SEEK_MODE whence)
+{
+    int res = 0;
+    struct file_descriptor* desc = file_get_descriptor(fd);
+    if(!desc){
+        res = -EIO;
+        goto out;
+    }
+    res = desc->filesystem->seek(desc->_private,offset,whence);
+    out:
+    return res;
+}
+
+int fread(void* ptr, uint32_t size, uint32_t nmemb, int fd)
+{
+    int res = 0;
+    if(size == 0 || nmemb == 0 || fd < 1)
+    {
+        res = -EINVARG;
+        goto out;
+    }
+    struct file_descriptor* desc = file_get_descriptor(fd);
+    if(!desc)
+    {
+        res = -EINVARG;
+        goto out;
+    }
+    res = desc->filesystem->read(desc->disk,desc->_private,size,nmemb,(char*)ptr);
+    out:
+    return res;
+}
+
+static int file_free_descriptor(struct file_descriptor* desc){
+    file_descriptors[desc->index - 1] = 0x00;
+    kfree(desc);
+    return 0;
+}
+
+int fclose(int fd)
+{
+    int res = 0;
+
+    struct file_descriptor* desc = file_get_descriptor(fd);
+    if(!desc){
+        res = -EIO;
+        goto out;
+    }
+    res = desc->filesystem->close(desc->_private);
+    if(res == SmollOs_ALL_OK){
+        file_free_descriptor(desc);
+    }
+    out:
+    return res;
+}
+

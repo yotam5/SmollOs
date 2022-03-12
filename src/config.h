@@ -12,5 +12,5 @@
 #define SmollOs_MAX_FILE_SYSTEMS 12
 #define SmollOs_MAX_FILE_DESCRIPTORS 512
 #define SmollOs_MAX_PATH 108
-
+#define SmollOs_TOTAL_GDT_SEGMENTS 3
 #endif

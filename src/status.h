@@ -8,4 +8,5 @@
 #define EBADPATH 4
 #define EFSNOTUS 5
 #define ERDONLY  6
+#define EUIMP    7
 #endif
