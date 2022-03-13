@@ -6,13 +6,13 @@
 #include "./memory/paging/paging.h"
 #include "disk/disk.h"
 #include "./fs/pparser.h"
-#include <stddef.h>
 #include <stdint.h>
 #include "./disk/streamer.h"
 #include "./string/string.h"
 #include "./gdt/gdt.h"
 #include "./config.h"
-
+#include "./task/tss.h"
+#include "stddef.h"
 uint16_t *video_mem = 0;
 uint16_t terminal_row = 0;
 uint16_t terminal_col = 0;
@@ -72,13 +72,16 @@ void panic(const char* msg)
   while(1){}
 }
 
-
+struct tss tss;
 struct gdt gdt_real[SmollOs_TOTAL_GDT_SEGMENTS];
 struct gdt_structured gdt_structured[SmollOs_TOTAL_GDT_SEGMENTS] = 
 {
   {.base = 0x00, .limit = 0x00, .type = 0x00},      //null segment
   {.base = 0x00, .limit = 0xffffffff, .type = 0x9a},  //kernel code segment
-  {.base = 0x00, .limit = 0xffffffff, .type = 0x92} //kernel data segment
+  {.base = 0x00, .limit = 0xffffffff, .type = 0x92}, //kernel data segment
+  {.base = 0x00, .limit = 0xffffffff, .type = 0xf8}, //user code segment
+  {.base = 0x00, .limit = 0xffffffff, .type = 0xf2}, //user data segment
+  {.base = (uint32_t)&tss, .limit = sizeof(tss), .type = 0xe9} //tss segment
 };
 
 void kernel_main() {
@@ -91,6 +94,12 @@ void kernel_main() {
   fs_init();
   disk_search_and_init();
   idt_init();
+
+  //tss setup
+  memset(&tss,0x00,sizeof(tss));
+  tss.esp0 = 0x600000;
+  tss.ss0 = KERNEL_DATA_SELECTOR;
+  tss_load(0x28);
 
   // void* ptr1 = kmalloc(50);
   // void* ptr2 = kmalloc(100);
