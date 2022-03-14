@@ -64,7 +64,7 @@ void print(const char *str) {
   }
 }
 
-static struct paging_4g_chunk *kernel_chunk = 0;
+static struct paging_4gb_chunk *kernel_chunk = 0;
 
 void panic(const char* msg)
 {

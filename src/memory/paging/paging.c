@@ -7,7 +7,7 @@ static uint32_t* current_directory = 0;
 void paging_load_directory(uint32_t* directory);
 
 //create page directory with page tables
-struct paging_4g_chunk* paging_new_4gb(uint8_t flags){
+struct paging_4gb_chunk* paging_new_4gb(uint8_t flags){
     uint32_t* directory = kzalloc(sizeof(uint32_t)*PAGING_TOTAL_ENTRIES_PER_TABLE);
     int offset = 0;
     for(int i = 0;i < PAGING_TOTAL_ENTRIES_PER_TABLE;i++){
@@ -19,7 +19,7 @@ struct paging_4g_chunk* paging_new_4gb(uint8_t flags){
         directory[i] = (uint32_t)entry | flags | PAGING_IS_WRITABLE;
     }
 
-    struct paging_4g_chunk* chunk_4g = kzalloc(sizeof(struct paging_4g_chunk));
+    struct paging_4gb_chunk* chunk_4g = kzalloc(sizeof(struct paging_4gb_chunk));
     chunk_4g->directory_entry = directory;
     return chunk_4g;
 }
@@ -29,7 +29,7 @@ void paging_switch(uint32_t* directory){
     current_directory  = directory;
 }
 
-uint32_t* paging_4gb_chunk_get_directory(struct paging_4g_chunk* chunk){
+uint32_t* paging_4gb_chunk_get_directory(struct paging_4gb_chunk* chunk){
     return chunk->directory_entry;
 }
 
@@ -71,4 +71,14 @@ int paging_set(uint32_t *directory, void* virt,uint32_t val)
     uint32_t* table = (uint32_t*)(entry & 0xfffff000);
     table[table_index] = val;
     return 0;
+}
+
+void paging_free_4gb(struct paging_4gb_chunk* chunk){
+    for(int i = 0; i < 1024;i++){
+        uint32_t entry = chunk->directory_entry[i];
+        uint32_t* table = (uint32_t*)(entry & 0xfffff000);
+        kfree(table);
+    }
+    kfree(chunk->directory_entry);
+    kfree(chunk);
 }
