@@ -95,6 +95,20 @@ char* strcpy(char* dest,  const char* src)
     return res;
 }
 
+char* strncpy(char* dest, const char* src,int count)
+{
+    int i;
+    for(i = 0;i < count - 1;i++)
+    {
+        if(src[i] == 0x00){
+            break;
+        }
+        dest[i] = src[i];
+    }
+    dest[i] = 0x00;
+    return dest;
+}
+
 int strnlen(const char *ptr,int max)
 {
     int i = 0;
