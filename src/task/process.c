@@ -42,7 +42,8 @@ static int process_load_binary(const char* filename, struct process* process){
         res = -ENOMEM;
         goto out;
     }
-    if(fread(program_data_ptr,stat.filesize,1,fd)!=1){
+    int tmp = fread(program_data_ptr,stat.filesize,1,fd);
+    if(tmp!=1){
         res = -EIO;
         goto out;
     }
@@ -115,6 +116,7 @@ int process_load_for_slot(const char* filename, struct process ** process,int pr
     int e = ERROR_I(task);
     if(e == 0){
         res = ERROR_I(task);
+        goto out;
     }
     _process->task = task;
     res = process_map_memory(_process);

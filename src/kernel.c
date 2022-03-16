@@ -12,7 +12,11 @@
 #include "./gdt/gdt.h"
 #include "./config.h"
 #include "./task/tss.h"
+#include "status.h"
 #include "stddef.h"
+#include "./task/task.h"
+#include "./task/process.h"
+
 uint16_t *video_mem = 0;
 uint16_t terminal_row = 0;
 uint16_t terminal_col = 0;
@@ -121,7 +125,7 @@ void kernel_main() {
 
   disk_get(0);
 
-  enable_interrupts();
+  //enable_interrupts();
   /*struct path_root* root_path = pathparser_parse("0:/bin/shell.exe",NULL);
   if(root_path)
   {
@@ -133,14 +137,22 @@ void kernel_main() {
   diskstreamer_read(stream, &c, 1);*/
 
   // outb(0x60, 0xff);
-      //struct file_stat s;
-    print("booted");
-  /*int fd = fopen("0:/hello.txt","r");
+   /*   struct file_stat s;
+    print("booted\n");
+  int fd = fopen("0:/hello.txt","r");
   if(fd)
   {
     fstat(fd,&s);
     fclose(fd);
-    print("work");
+    print("worked\n");
   }*/
+  struct process* process = 0;
+  int res = process_load("0:/blank.bin",&process);
+  if(res != SmollOs_ALL_OK){
+    panic("failed to load blank.bin");
+  }
+  print("run first ever task\n");
+  task_run_first_ever_task();
+  print("end of kernel.c\n");
   while(1){}
 }

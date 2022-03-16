@@ -25,6 +25,7 @@ int task_init(struct task* task,struct process* process)
     task->registers.ip = SmollOs_PROGRAM_VIRTUAL_ADDRESS;
     task->registers.ss = USER_DATA_SEGMENT;
     task->registers.esp = SmollOs_PROGRAM_VIRTUAL_STACK_ADDRESS_START;
+    task->registers.cs = USER_CODE_SEGMENT;
     task->process = process;
     return 0;   
 }
@@ -75,6 +76,7 @@ int task_free(struct task* task)
      if(task_head == 0){
          task_head = task;
          task_tail = task;
+         current_task = task;
          goto out;
      }
      task_tail->next = task;
@@ -105,5 +107,7 @@ void task_run_first_ever_task(){
         panic("no current task exists");
     }
     task_switch(task_head);
+    print("task switched\n");
     task_return(&task_head->registers);
+    print("task returned\n");
 }

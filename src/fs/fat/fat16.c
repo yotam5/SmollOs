@@ -564,6 +564,7 @@ void *fat16_open(struct disk *disk, struct path_part *path, FILE_MODE mode) {
 
 int fat16_read(struct disk* disk, void* descriptor, uint32_t size, uint32_t nmemb,char* out_ptr)
 {
+    print("fat16 read called\n");
     int res = 0;
     struct fat_file_descriptor* fat_desc = descriptor;
     struct fat_directory_item* item = fat_desc->item->item;
@@ -578,6 +579,7 @@ int fat16_read(struct disk* disk, void* descriptor, uint32_t size, uint32_t nmem
         out_ptr+=size;
         offset+=size;
     }
+    res = nmemb;
     out:
     return res;
 }

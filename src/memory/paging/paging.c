@@ -95,7 +95,7 @@ void paging_free_4gb(struct paging_4gb_chunk* chunk){
 
 
 int paging_map(uint32_t* directory, void* virt,void* phys,int flags){
-    if((unsigned int)virt % PAGING_PAGE_SIZE || ((unsigned int)phys % PAGING_PAGE_SIZE))
+    if(((unsigned int)virt % PAGING_PAGE_SIZE) || ((unsigned int)phys % PAGING_PAGE_SIZE))
     {
         return -EINVARG;
     }
