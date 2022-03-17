@@ -44,7 +44,7 @@ task_return:
     call restore_general_purpose_registers
     add esp, 4
 
-    ; Let's leave kernel land and execute in user land!
+    ; leave to userland
     iretd
     
 ; void restore_general_purpose_registers(struct registers* regs);

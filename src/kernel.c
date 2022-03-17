@@ -16,6 +16,7 @@
 #include "stddef.h"
 #include "./task/task.h"
 #include "./task/process.h"
+#include "./isr80h/isr80h.h"
 
 uint16_t *video_mem = 0;
 uint16_t terminal_row = 0;
@@ -76,6 +77,11 @@ void panic(const char* msg)
   while(1){}
 }
 
+void kernel_page(){
+  kernel_registers();
+  paging_switch(kernel_chunk); //kernel can access all memeory, memory is linear
+}
+
 struct tss tss;
 struct gdt gdt_real[SmollOs_TOTAL_GDT_SEGMENTS];
 struct gdt_structured gdt_structured[SmollOs_TOTAL_GDT_SEGMENTS] = 
@@ -114,7 +120,7 @@ void kernel_main() {
                                 PAGING_ACCESS_FROM_ALL);
 
   // switch to kernel paging chunk
-  paging_switch(paging_4gb_chunk_get_directory(kernel_chunk));
+  paging_switch(kernel_chunk);
 
   char *ptr = kzalloc(4096);
   paging_set(paging_4gb_chunk_get_directory(kernel_chunk), (void *)0x1000,
@@ -122,7 +128,7 @@ void kernel_main() {
                  PAGING_IS_WRITABLE);
 				 
   enable_paging();
-
+  isr80h_register_commands();
   disk_get(0);
 
   //enable_interrupts();

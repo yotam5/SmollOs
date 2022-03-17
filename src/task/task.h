@@ -4,6 +4,7 @@
 #include "../config.h"
 #include "../memory/paging/paging.h"
 
+struct interrupt_frame;
 struct registers
 {
     uint32_t edi;
@@ -40,4 +41,5 @@ void user_registers();
 int task_switch(struct task* task);
 int task_page();
 void task_run_first_ever_task();
+void task_current_save_state(struct interrupt_frame *frame);
 #endif
