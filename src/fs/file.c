@@ -10,13 +10,13 @@
 #include "../string/string.h"
 #include "../kernel.h"
 
-struct filesystem* filesystems[SmollOs_MAX_FILE_SYSTEMS];
+struct filesystem* filesystems[SmollOs_MAX_FILESYSTEMS];
 struct file_descriptor* file_descriptors[SmollOs_MAX_FILE_DESCRIPTORS];
 
 static struct filesystem** fs_get_free_filesystem()
 {
     int i = 0;
-    for(i = 0; i < SmollOs_MAX_FILE_SYSTEMS;i++)
+    for(i = 0; i < SmollOs_MAX_FILESYSTEMS;i++)
     {
         if(filesystems[i] == 0)
         {
@@ -86,7 +86,7 @@ static struct file_descriptor* file_get_descriptor(int fd)
 struct filesystem* fs_resolve(struct disk* disk)
 {
     struct filesystem* fs = 0;
-    for(int i = 0; i < SmollOs_MAX_FILE_SYSTEMS;i++)
+    for(int i = 0; i < SmollOs_MAX_FILESYSTEMS;i++)
     {
         if(filesystems[i] != 0 && filesystems[i]->resolve(disk) == 0)
         {

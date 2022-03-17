@@ -19,20 +19,19 @@ struct registers
     uint32_t flags;
     uint32_t esp;
     uint32_t ss;
-};
+}__attribute__((packed));
 
 struct process;
 
 struct task{
     struct paging_4gb_chunk* page_directory;//page directory of the task
-    
     struct registers registers; //when task is not running
     struct process* process; //the process of the task
     struct task* next;//next task in the linked list
     struct task* prev; //pevious task in linked list
 };
 int task_init(struct task* task,struct process* process);
- struct task* task_new(struct process* process);
+struct task* task_new(struct process* process);
 int task_free(struct task* task);
 struct task* task_get_next();
 void task_return(struct registers* regs);
