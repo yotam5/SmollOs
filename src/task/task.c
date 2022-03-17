@@ -24,8 +24,8 @@ int task_init(struct task* task,struct process* process)
     }
     task->registers.ip = SmollOs_PROGRAM_VIRTUAL_ADDRESS;
     task->registers.ss = USER_DATA_SEGMENT;
-    task->registers.esp = SmollOs_PROGRAM_VIRTUAL_STACK_ADDRESS_START;
     task->registers.cs = USER_CODE_SEGMENT;
+    task->registers.esp = SmollOs_PROGRAM_VIRTUAL_STACK_ADDRESS_START;  
     task->process = process;
     return 0;   
 }
@@ -92,7 +92,7 @@ int task_free(struct task* task)
 
 int task_switch(struct task* task){
     current_task = task;
-    paging_switch(task->page_directory->directory_entry); //note!
+    paging_switch(task->page_directory->directory_entry); 
     return 0;
 }
 

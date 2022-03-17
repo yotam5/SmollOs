@@ -3,7 +3,7 @@
 
 void encodeGdtEntry(uint8_t* target, struct gdt_structured source)
 {
-    if((source.limit >= 65536) && ((source.limit & 0xFFF) != 0XFFF))
+    if((source.limit >= 65536) && ((source.limit & 0xFFF) != 0xFFF))
     {
         panic("encodeGdtEntry: invalid arg\n");
     }
