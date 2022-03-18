@@ -46,7 +46,7 @@ _start:
 	call kernel_main
 	jmp $
 
-kernel_registers:
+kernel_registers: ;point registers to the kernel segment
 	mov ax,0x10
 	mov ds,ax
 	mov es,ax
