@@ -64,7 +64,7 @@ void* paging_align_address(void* ptr){
 
 int paging_set(uint32_t *directory, void* virt,uint32_t val)
 {
-    print("\nenter paging set\n");
+    //print("\nenter paging set\n");
     if(!paging_is_aligned(virt)){
         print("paging error");
         return -EINVARG;
