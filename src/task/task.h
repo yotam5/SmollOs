@@ -31,6 +31,7 @@ struct task{
     struct task* next;//next task in the linked list
     struct task* prev; //pevious task in linked list
 };
+struct task* task_current();
 int task_init(struct task* task,struct process* process);
 struct task* task_new(struct process* process);
 int task_free(struct task* task);
@@ -44,4 +45,6 @@ void task_run_first_ever_task();
 void task_current_save_state(struct interrupt_frame *frame);
 int copy_string_from_task(struct task* task,void* virtuall, void*phys, int max);
 uint32_t paging_get(uint32_t* directory,void* virt);
+void *task_get_stack_item(struct task* task, int index);
+int task_page_task(struct task* task);
 #endif

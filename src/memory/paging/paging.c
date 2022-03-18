@@ -107,7 +107,7 @@ int page_map_range(struct paging_4gb_chunk* directory, void*virt, void*phys,int 
     int res = 0;
     for(int i = 0; i < count;i++){
         res = paging_map(directory,virt,phys,flags);
-        if(res == 0){
+        if(res < 0){
             break;
         }
         virt += PAGING_PAGE_SIZE;

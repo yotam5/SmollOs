@@ -180,3 +180,19 @@ void task_current_save_state(struct interrupt_frame *frame) {
   struct task *task = task_current();
   task_save_state(task, frame);
 }
+
+int task_page_task(struct task* task){
+  user_registers();
+  paging_switch(task->page_directory);
+  return 0;
+}
+
+//run at kernel page
+void *task_get_stack_item(struct task* task, int index){ 
+  void* result = 0;
+  uint32_t* sp_ptr = (uint32_t*) task->registers.esp; //virutal addr
+  task_page_task(task); //switch to given task page
+  result = (void*)sp_ptr[index];
+  kernel_page();
+  return result;
+}
