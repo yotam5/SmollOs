@@ -17,6 +17,7 @@
 #include "./task/task.h"
 #include "./task/process.h"
 #include "./isr80h/isr80h.h"
+#include "./keyboard/keyboard.h"
 
 uint16_t *video_mem = 0;
 uint16_t terminal_row = 0;
@@ -129,6 +130,7 @@ void kernel_main() {
 				 
   enable_paging();
   isr80h_register_commands();
+  keyboard_init();
   disk_get(0);
 
   //enable_interrupts();
