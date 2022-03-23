@@ -4,11 +4,13 @@
 #include "../kernel.h"
 #include "../memory/memory.h"
 #include "../task/task.h"
+#include "../status.h"
 #include <stdint.h>
 
 struct idt_desc idt_descriptors[SmollOs_TOTAL_INTERRUPTS];
 struct idtr_desc idtr_descriptor;
 extern void *interrupt_pointer_table[SmollOs_TOTAL_INTERRUPTS];
+static INTERRUPT_CALLBACK_FUNCTION interrupt_callbacks[SmollOs_TOTAL_INTERRUPTS];
 static ISR80H_COMMAND isr80h_commands[SmollOs_MAX_ISR80H_COMMANDS];
 extern void idt_load(struct idtr_desc *ptr);
 extern void int21h();
@@ -16,7 +18,12 @@ extern void no_interrupt();
 extern void isr80h_wrapper();
 
 void interrupt_handler(int interrupt, struct interrupt_frame *frame) {
-  
+  kernel_page();
+  if(interrupt_callbacks[interrupt] != 0){
+    task_current_save_state(frame);
+    interrupt_callbacks[interrupt](frame);
+  }
+  task_page();
   outb(0x20,0x20); //acknoledgment
 }
 
@@ -75,5 +82,15 @@ void *isr80h_handler(int command, struct interrupt_frame *frame) {
   task_current_save_state(frame); // save registers to stack
   res = isr80h_handle_command(command, frame);
   task_page();
+  return res;
+}
+
+int idt_register_interrupt_callback(int interrupt, INTERRUPT_CALLBACK_FUNCTION interrupt_callback){
+  int res = SmollOs_ALL_OK;
+  if(interrupt < 0 || interrupt >= SmollOs_TOTAL_INTERRUPTS){
+    print("error in registering interrupt\n");
+    return -EINVARG;
+  }
+  interrupt_callbacks[interrupt] = interrupt_callback;
   return res;
 }

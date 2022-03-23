@@ -4,10 +4,11 @@
 
 struct interrupt_frame;
 typedef void*(*ISR80H_COMMAND)(struct interrupt_frame* frame);
+typedef void(*INTERRUPT_CALLBACK_FUNCTION)();
 void idt_init();
 void enable_interrupts();
 void disable_interrupts();
-
+int idt_register_interrupt_callback(int interrupt, INTERRUPT_CALLBACK_FUNCTION interrupt_callback);
 struct idt_desc
 {
 	uint16_t offset_1; //offset 0-15
