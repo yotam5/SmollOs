@@ -4,12 +4,20 @@
 #include "../config.h"
 #include "./task.h"
 
+#define PROCESS_FILETYPE_ELF 0
+#define PROCESS_FILETYPE_BINARY 1
+typedef unsigned char PROCESS_FILE_TYPE;
 struct process{
     uint16_t id;
     char filename[SmollOs_MAX_PATH];
     struct task* task;
     void* allocations[SmollOs_MAX_PROGRAM_ALLOCATIONS]; //malloc of the process
-    void* ptr; //pointer to process in memeory
+    PROCESS_FILE_TYPE filetype;
+    union
+    {
+        void* ptr;
+        struct elf_file* elf_file;
+    };
     void* stack ; //pointer to stack memory
     uint32_t size; //size of the data pointed to by ptr
     struct keyboard_buffer{

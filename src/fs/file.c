@@ -120,11 +120,13 @@ int fopen(const char* filename, const char* mode_str)
     int res = 0;
     struct path_root* root_path = pathparser_parse(filename, NULL);
     if(!root_path){
+        print("root path error\n");
         res=-EINVARG;
         goto out;
     }
     if(!root_path->first) //can open root directory
     {
+        print("root first error\n");
         res = -EINVARG;
         goto out;
     }
@@ -142,6 +144,7 @@ int fopen(const char* filename, const char* mode_str)
     FILE_MODE mode = file_get_mode_by_string(mode_str);
     if(mode == FILE_MODE_INVALID)
     {
+        print("file mode error\n");
         res = -EINVARG;
         goto out;
     }
@@ -199,12 +202,14 @@ int fread(void* ptr, uint32_t size, uint32_t nmemb, int fd)
     int res = 0;
     if(size == 0 || nmemb == 0 || fd < 1)
     {
+        print("fread error\n");
         res = -EINVARG;
         goto out;
     }
     struct file_descriptor* desc = file_get_descriptor(fd);
     if(!desc)
     {
+        print("file desc error\n");
         res = -EINVARG;
         goto out;
     }

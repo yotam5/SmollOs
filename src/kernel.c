@@ -34,11 +34,28 @@ void terminal_putchar(int x, int y, char c, char colour) {
   video_mem[(y * VGA_WIDTH) + x] = terminal_make_char(c, colour);
 }
 
+void terminal_backspace(){
+  if(terminal_row == 0 && terminal_col == 0){
+    return;
+  }
+  if(terminal_col == 0){
+    --terminal_row;
+    terminal_col = VGA_WIDTH;
+  }
+  --terminal_col;
+  terminal_writechar(' ',15);
+  --terminal_col;
+}
+
 // put char on screen and automate location indexing
 void terminal_writechar(char c, char colour) {
   if (c == '\n') {
     ++terminal_row;
     terminal_col = 0;
+    return;
+  }
+  if(c == 0x08){
+    terminal_backspace();
     return;
   }
   terminal_putchar(terminal_col, terminal_row, c, colour);
@@ -98,7 +115,7 @@ struct gdt_structured gdt_structured[SmollOs_TOTAL_GDT_SEGMENTS] =
 
 void kernel_main() {
   terminal_initialize();
-  print("hello\nworld");
+  //print("hello\nworld");
   memset(gdt_real,0x00,sizeof(gdt_real));
   gdt_structured_to_gdt(gdt_real, gdt_structured, SmollOs_TOTAL_GDT_SEGMENTS);
   gdt_load(gdt_real,sizeof(gdt_real));
@@ -157,12 +174,12 @@ void kernel_main() {
     print("worked\n");
   }*/
   struct process* process = 0;
-  int res = process_load_switch("0:/blank.bin",&process);
+  int res = process_load_switch("0:/blank.elf",&process);
   if(res != SmollOs_ALL_OK){
     panic("failed to load blank.bin");
   }
-  print("run first ever task\n");
+  //print("run first ever task\n");
   task_run_first_ever_task();
-  print("end of kernel.c\n");
+  //print("end of kernel.c\n");
   while(1){}
 }

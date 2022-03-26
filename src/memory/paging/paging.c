@@ -3,6 +3,7 @@
 #include "../heap/kheap.h"
 #include "../../status.h"
 #include "../../config.h"
+#include "../../loader/formats/elf/elf_loader.h"
 
 void print(const char* str);
 static uint32_t* current_directory = 0;
@@ -97,6 +98,7 @@ void paging_free_4gb(struct paging_4gb_chunk* chunk){
 int paging_map(struct paging_4gb_chunk* directory, void* virt,void* phys,int flags){
     if(((unsigned int)virt % PAGING_PAGE_SIZE) || ((unsigned int)phys % PAGING_PAGE_SIZE))
     {
+        print("error in map\n");
         return -EINVARG;
     }
     return paging_set(directory->directory_entry,virt,(uint32_t)phys | flags);
@@ -119,18 +121,22 @@ int page_map_range(struct paging_4gb_chunk* directory, void*virt, void*phys,int 
 int paging_map_to(struct paging_4gb_chunk* directory, void* virt, void* phys, void* phys_end, int flags){
     int res = 0;
     if((uint32_t)virt % PAGING_PAGE_SIZE){
+        print("virt no align with page size\n");
         res = -EINVARG;
         goto out;
     }
     if((uint32_t)phys % PAGING_PAGE_SIZE){
+        print("phys no align with page size\n");
         res = -EINVARG;
         goto out;
     }
     if((uint32_t)phys_end % PAGING_PAGE_SIZE){
+        print("phys end no align with page size\n");
         res = -EINVARG;
         goto out;
     }
     if((uint32_t)phys_end < (uint32_t)phys){
+        print("phys_end smaller than phys\n");
         res = -EINVARG;
         goto out;
     }
@@ -148,4 +154,12 @@ uint32_t paging_get(uint32_t* directory,void* virt){
   uint32_t entry = directory[directory_index];
   uint32_t* table = (uint32_t*)(entry & 0xfffff000);
   return table[table_index];
+}
+
+void* paging_align_to_lower_page(void* addr)
+{
+    uint32_t _addr = (uint32_t)addr;
+    _addr -= (_addr% PAGING_PAGE_SIZE);
+    return (void*)_addr;
+
 }

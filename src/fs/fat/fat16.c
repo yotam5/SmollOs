@@ -434,6 +434,7 @@ struct fat_directory* fat16_load_fat_directory(struct disk* disk,struct fat_dire
     struct fat_private* fat_private = disk->fs_private;
     if(!(item->attribute & FAT_FILE_SUBDIRECTORY))
     {
+        print("attribute error\n");
         res = -EINVARG;
         goto out;
     }
@@ -564,7 +565,7 @@ void *fat16_open(struct disk *disk, struct path_part *path, FILE_MODE mode) {
 
 int fat16_read(struct disk* disk, void* descriptor, uint32_t size, uint32_t nmemb,char* out_ptr)
 {
-    print("fat16 read called\n");
+    //print("fat16 read called\n");
     int res = 0;
     struct fat_file_descriptor* fat_desc = descriptor;
     struct fat_directory_item* item = fat_desc->item->item;
@@ -590,6 +591,7 @@ int fat16_seek(void* private,uint32_t offset,FILE_SEEK_MODE seek_mode)
     struct fat_file_descriptor* desc = private;
     struct fat_item* desc_item = desc->item;
     if(desc->item->type != FAT_ITEM_TYPE_FILE){
+        print("fat type error\n");
         res = -EINVARG;
         goto out;
     }

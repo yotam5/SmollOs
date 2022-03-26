@@ -1,6 +1,6 @@
 
 ENTRY(_start)
-OUTPUT_FORMAT(binary)
+OUTPUT_FORMAT(elf32-i386)
 SECTIONS
 {
 	. = 0x400000;
