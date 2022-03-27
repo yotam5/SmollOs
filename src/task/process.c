@@ -35,6 +35,95 @@ struct process* process_get(int process_id)
     return processes[process_id];
 }
 
+int process_switch(struct process* process)
+{
+    current_process = process;
+    return 0;
+}
+
+static int process_find_free_allocation_index(struct process* process)
+{
+    int res = -ENOMEM;
+    for (int i = 0; i < SmollOs_MAX_PROGRAM_ALLOCATIONS; i++)
+    {
+        if (process->allocations[i] == 0)
+        {
+            res = i;
+            break;
+        }
+    }
+
+    return res;
+}
+
+void* process_malloc(struct process* process, size_t size)
+{
+    void* ptr = kzalloc(size);
+    if (!ptr)
+    {
+        goto out_err;
+    }
+
+    int index = process_find_free_allocation_index(process);
+    if (index < 0)
+    {
+        goto out_err;
+    }
+
+    int res = paging_map_to(process->task->page_directory, ptr, ptr, paging_align_address(ptr+size), PAGING_IS_WRITABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    if (res < 0)
+    {
+        goto out_err;
+    }
+    
+    process->allocations[index] = ptr;
+    return ptr;
+
+out_err:
+    if(ptr)
+    {
+        kfree(ptr);
+    }
+    return 0;
+}
+
+static bool process_is_process_pointer(struct process* process, void* ptr)
+{
+    for (int i = 0; i < SmollOs_MAX_PROGRAM_ALLOCATIONS; i++)
+    {
+        if (process->allocations[i] == ptr)
+            return true;
+    }
+
+    return false;
+}
+
+static void process_allocation_unjoin(struct process* process, void* ptr)
+{
+    for (int i = 0; i < SmollOs_MAX_PROGRAM_ALLOCATIONS; i++)
+    {
+        if (process->allocations[i] == ptr)
+        {
+            process->allocations[i] = 0x00;
+        }
+    }
+}
+
+void process_free(struct process* process, void* ptr)
+{
+    // Not this processes pointer? Then we cant free it.
+    if (!process_is_process_pointer(process, ptr))
+    {
+        return;
+    }
+
+    // Unjoin the allocation
+    process_allocation_unjoin(process, ptr);
+
+    // We can now free the memory.
+    kfree(ptr);
+}
+
 static int process_load_binary(const char* filename, struct process* process)
 {
     int res = 0;
@@ -64,6 +153,7 @@ static int process_load_binary(const char* filename, struct process* process)
         res = -EIO;
         goto out;
     }
+
     process->filetype = PROCESS_FILETYPE_BINARY;
     process->ptr = program_data_ptr;
     process->size = stat.filesize;
@@ -77,25 +167,33 @@ static int process_load_elf(const char* filename, struct process* process)
 {
     int res = 0;
     struct elf_file* elf_file = 0;
-    res = elf_load(filename,&elf_file);
-    if(ISERR(res))
+    res = elf_load(filename, &elf_file);
+    if (ISERR(res))
     {
         goto out;
     }
+
     process->filetype = PROCESS_FILETYPE_ELF;
     process->elf_file = elf_file;
-    out:
+out:
     return res;
 }
-
 static int process_load_data(const char* filename, struct process* process)
 {
     int res = 0;
     res = process_load_elf(filename, process);
-    if(res == -EINFORMAT)
+    if (res == -EINFORMAT)
     {
-        res = process_load_binary(filename,process);
+        res = process_load_binary(filename, process);
     }
+
+    return res;
+}
+
+int process_map_binary(struct process* process)
+{
+    int res = 0;
+    paging_map_to(process->task->page_directory, (void*) SmollOs_PROGRAM_VIRTUAL_ADDRESS, process->ptr, paging_align_address(process->ptr + process->size), PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITABLE);
     return res;
 }
 
@@ -106,50 +204,49 @@ static int process_map_elf(struct process* process)
     struct elf_file* elf_file = process->elf_file;
     struct elf_header* header = elf_header(elf_file);
     struct elf32_phdr* phdrs = elf_pheader(header);
-    for(int i = 0; i < header->e_phnum;i++){
+    for (int i = 0; i < header->e_phnum; i++)
+    {
         struct elf32_phdr* phdr = &phdrs[i];
-        void* phdr_phys_address = elf_phdr_phys_address(elf_file,phdr);
+        void* phdr_phys_address = elf_phdr_phys_address(elf_file, phdr);
         int flags = PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL;
-        if(phdr->p_flags & PF_W){
+        if (phdr->p_flags & PF_W)
+        {
             flags |= PAGING_IS_WRITABLE;
         }
-        res = paging_map_to(process->task->page_directory, paging_align_to_lower_page((void*)phdr->p_vaddr), 
-            paging_align_to_lower_page(phdr_phys_address), paging_align_address(phdr_phys_address+phdr->p_memsz), flags);
-        if(ISERR(res)){
+        res = paging_map_to(process->task->page_directory, paging_align_to_lower_page((void*)phdr->p_vaddr), paging_align_to_lower_page(phdr_phys_address), paging_align_address(phdr_phys_address+phdr->p_memsz), flags);
+        if (ISERR(res))
+        {
             break;
         }
     }
     return res;
 }
-
-int process_map_binary(struct process* process)
-{
-    int res = 0;
-    paging_map_to(process->task->page_directory, (void*) SmollOs_PROGRAM_VIRTUAL_ADDRESS, process->ptr, paging_align_address(process->ptr + process->size), PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITABLE);
-    return res;
-}
 int process_map_memory(struct process* process)
 {
     int res = 0;
+
     switch(process->filetype)
     {
         case PROCESS_FILETYPE_ELF:
             res = process_map_elf(process);
         break;
-        
+
         case PROCESS_FILETYPE_BINARY:
             res = process_map_binary(process);
         break;
 
         default:
-            panic("invalid format process map memory invalid filetype\n");
+            panic("process_map_memory: Invalid filetype\n");
     }
-    if(res < 0){goto out;}
-    //map stack
-    paging_map_to(process->task->page_directory,(void*)SmollOs_PROGRAM_VIRTUAL_STACK_ADDRESS_END,process->stack,
-        paging_align_address(process->stack +SmollOs_USER_PROGRAM_STACK_SIZE),
-        PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITABLE);
-    out:
+
+    if (res < 0)
+    {
+        goto out;
+    }
+
+    // Finally map the stack
+    paging_map_to(process->task->page_directory, (void*)SmollOs_PROGRAM_VIRTUAL_STACK_ADDRESS_END, process->stack, paging_align_address(process->stack+SmollOs_USER_PROGRAM_STACK_SIZE), PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITABLE);
+out:
     return res;
 }
 
@@ -176,6 +273,17 @@ int process_load(const char* filename, struct process** process)
 
     res = process_load_for_slot(filename, process, process_slot);
 out:
+    return res;
+}
+
+int process_load_switch(const char* filename, struct process** process)
+{
+    int res = process_load(filename, process);
+    if (res == 0)
+    {
+        process_switch(*process);
+    }
+
     return res;
 }
 
@@ -219,8 +327,8 @@ int process_load_for_slot(const char* filename, struct process** process, int pr
 
     // Create a task
     task = task_new(_process);
-    int f = ERROR_I(task);
-    if (f== 0)
+    int e = ERROR_I(task);
+    if (e == 0)
     {
         res = ERROR_I(task);
         goto out;
@@ -250,73 +358,4 @@ out:
        // Free the process data
     }
     return res;
-}
-
-int process_switch(struct process* process){
-    current_process = process;
-    return 0;
-}
-
-int process_load_switch(const char* filename, struct process** process){
-    int res = process_load(filename,process);
-    if(res == 0){
-        process_switch(*process);
-    }
-    return res;
-}
-static int process_find_free_allocation_index(struct process* process)
-{
-    int res = -ENOMEM;
-    for(int i = 0;i < SmollOs_MAX_PROGRAM_ALLOCATIONS;i++)
-    {
-        if(process->allocations[i] == 0)
-        {
-            res = i;
-            break;
-        }
-    }
-    return res;
-}
-void* process_malloc(struct process* process,size_t size)
-{
-    void* ptr = kzalloc(size);
-    if(!ptr){
-        return 0;
-    }
-    int index = process_find_free_allocation_index(process);
-    if(index < 0){
-        return 0;
-    }
-    process->allocations[index] = ptr;
-    return ptr;
-}
-
-static bool process_is_process_pointer(struct process* process, void* ptr)
-{
-    for(int i = 0; i < SmollOs_MAX_PROGRAM_ALLOCATIONS;i++)
-    {
-        if(process->allocations[i] == ptr){
-            return true;
-        }
-    }
-    return false;
-}
-
-static void process_allocation_unjoin(struct process* process,void* ptr)
-{
-    for(int i = 0; i < SmollOs_MAX_PROGRAM_ALLOCATIONS;i++){
-        if(process->allocations[i] == ptr){
-            process->allocations[i] = 0x0;
-        }
-    }
-}
-
-void process_free(struct process* process, void* ptr)
-{
-    if(!process_is_process_pointer(process, ptr))
-    {
-        return;
-    }
-    process_allocation_unjoin(process, ptr);
-    kfree(ptr);
 }

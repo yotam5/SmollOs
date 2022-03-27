@@ -6,21 +6,19 @@
 
 int main(int argc, char** argv)
 {
-    //void* ptr = malloc(512);
-    //free(ptr);
-    /*print("123\n");
-    itoa(45);
-    print("\nprinted\n");
-    printf("my age is %i\n",98);*/
-    print("called\n");
-    char words[] = "hello how are you";
-    char delim[] = {" "};
-    const char* token = strtok(words,delim);
-    while(token){
-        print(token);
-        token = strtok(NULL,delim);
-        print("\n");
+    print("main");
+    char* ptr = (char*)malloc(20);
+    strcpy(ptr, "hello world");
+
+    print(ptr);
+
+    free(ptr);
+
+    ptr[0] = 'B';
+    print("abc\n");
+
+    while(1) 
+    {
     }
-    
     return 0;
 }

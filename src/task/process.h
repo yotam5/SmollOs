@@ -1,3 +1,4 @@
+
 #ifndef PROCESS_H
 #define PROCESS_H
 #include <stdint.h>
@@ -7,6 +8,12 @@
 #define PROCESS_FILETYPE_ELF 0
 #define PROCESS_FILETYPE_BINARY 1
 typedef unsigned char PROCESS_FILE_TYPE;
+struct process_allocation
+{
+    void* ptr;
+    size_t size;
+};
+
 struct process{
     uint16_t id;
     char filename[SmollOs_MAX_PATH];
