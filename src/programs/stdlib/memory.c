@@ -1,6 +1,5 @@
-#include "memory.h"
+#include "./memory.h"
 
-#ifndef S_MEMORY_H
 void* memset(void* ptr,int c, size_t size)
 {
 	char* c_ptr = (char*) ptr;
@@ -12,8 +11,8 @@ void* memset(void* ptr,int c, size_t size)
 
 void* memcpy(void* dest,void* src,int len)
 {
-	char *d = dest;
-	char *s = src;
+	char *d = (char*)dest;
+	char *s = (char*)src;
 	while(len--)
 	{
 		*d++ = *s++;
@@ -23,8 +22,8 @@ void* memcpy(void* dest,void* src,int len)
 
 int memcmp(void *s1, void *s2, int count)
 {
-	char* c1 = s1;
-	char* c2 = s2;
+	char* c1 = (char*)s1;
+	char* c2 = (char*)s2;
 	while(count-- > 0)
 	{
 		if(*c1++ != *c2++)
@@ -35,4 +34,3 @@ int memcmp(void *s1, void *s2, int count)
 	return 0;
 
 }
-#endif

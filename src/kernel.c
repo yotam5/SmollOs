@@ -174,7 +174,7 @@ void kernel_main() {
     print("worked\n");
   }*/
   struct process* process = 0;
-  int res = process_load_switch("0:/blank.elf",&process);
+  int res = process_load_switch("0:/shell.elf",&process);
   if(res != SmollOs_ALL_OK){
     panic("failed to load blank.bin");
   }

@@ -18,7 +18,7 @@ char *reverse(char *str)
     size_t len;
     if (str != NULL)
     {
-        len = strlen(str);
+        len = strlen (str);
         if (len > 1) {
             src = str;
             dst = src + len - 1;
@@ -35,7 +35,7 @@ char *reverse(char *str)
 /* itoa from K&R */
 char* itoa(int n)
 {
-    char s[50] = {};
+    char s[50];
     int i, sign;
 
     if ((sign = n) < 0)        /* record sign */
@@ -51,5 +51,4 @@ char* itoa(int n)
 
     reverse(s);
     s[i] = '\0';
-    print(s);
 }
