@@ -12,6 +12,8 @@ int getkey();
 
 void* smollos_malloc(size_t size);
 
+void* smollos_free(void* ptr);
+
 #ifdef __cplusplus
 // if this is a C++ compiler, we need to close off the extern declaration.
 };

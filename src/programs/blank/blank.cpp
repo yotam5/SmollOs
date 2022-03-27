@@ -3,7 +3,10 @@
 #include "../stdlib/stdlib.h"
 int main(int argc, char** argv)
 {
-    void* ptr = malloc(512);
+    //void* ptr = malloc(512);
+    //free(ptr);
+    itoa(12);
+    print("printed\n");
     while(1)
     {
         if(getkey() != 0)
