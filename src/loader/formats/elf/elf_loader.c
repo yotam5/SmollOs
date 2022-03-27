@@ -54,6 +54,11 @@ struct elf32_shdr* elf_sheader(struct elf_header* header)
     return (struct elf32_shdr*)((int)header+header->e_shoff);
 }
 
+void* elf_phdr_phys_address(struct elf_file* file, struct elf32_phdr* phdr)
+{
+  return elf_memory(file) + phdr->p_offset;
+}
+
 struct elf32_phdr* elf_pheader(struct elf_header* header)
 {
     if(header->e_phoff == 0)

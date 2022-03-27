@@ -1,4 +1,4 @@
-FILES = ./build/kernel.asm.o ./build/kernel.o ./build/loader/formats/elf_loader.o ./build/loader/formats/elf.o ./build/keyboard/classic.o ./build/keyboard/keyboard.o ./build/isr80h/io.o ./build/isr80h/misc.o ./build/task/process.o ./build/isr80h/isr80h.o ./build/task/task.asm.o ./build/task/tss.asm.o ./build/task/task.o ./build/disk/disk.o ./build/disk/streamer.o ./build/fs/pparser.o ./build/fs/file.o ./build/fs/fat/fat16.o ./build/string/string.o ./build/idt/idt.asm.o ./build/idt/idt.o ./build/memory/memory.o ./build/io/io.asm.o ./build/gdt/gdt.o ./build/gdt/gdt.asm.o ./build/memory/heap/heap.o ./build/memory/heap/kheap.o ./build/memory/paging/paging.o ./build/memory/paging/paging.asm.o
+FILES = ./build/kernel.asm.o ./build/kernel.o ./build/loader/formats/elf_loader.o ./build/loader/formats/elf.o ./build/keyboard/classic.o ./build/keyboard/keyboard.o ./build/isr80h/io.o ./build/isr80h/misc.o ./build/task/process.o ./build/isr80h/isr80h.o ./build/task/task.asm.o ./build/task/tss.asm.o ./build/task/task.o ./build/disk/disk.o ./build/disk/streamer.o ./build/fs/pparser.o ./build/fs/file.o ./build/fs/fat/fat16.o ./build/string/string.o ./build/idt/idt.asm.o ./build/idt/idt.o ./build/memory/memory.o ./build/io/io.asm.o ./build/gdt/gdt.o ./build/gdt/gdt.asm.o ./build/memory/heap/heap.o ./build/memory/heap/kheap.o ./build/memory/paging/paging.o ./build/memory/paging/paging.asm.o ./build/isr80h/heap.o
 INCLUDES = -I./src
 FLAGS = -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Werror -Wno-unused-label -Wno-cpp -Wno-unused-parameter -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -Iinc
 
@@ -11,6 +11,7 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	# Copy a file over
 	sudo cp ./hello.txt /mnt/d
 	sudo cp ./src/programs/blank/blank.elf /mnt/d
+
 	sudo umount /mnt/d
 
 ./bin/kernel.bin: $(FILES)
@@ -52,6 +53,9 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 
 ./build/isr80h/io.o: ./src/isr80h/io.c
 	i686-elf-gcc $(INCLUDES) -I./src/isr80h $(FLAGS) -std=gnu99 -c ./src/isr80h/io.c -o ./build/isr80h/io.o
+
+./build/isr80h/heap.o: ./src/isr80h/heap.c
+	i686-elf-gcc $(INCLUDES) -I./src/isr80h $(FLAGS) -std=gnu99 -c ./src/isr80h/heap.c -o ./build/isr80h/heap.o
 
 ./build/gdt/gdt.asm.o: ./src/gdt/gdt.asm
 	nasm -f elf -g ./src/gdt/gdt.asm -o ./build/gdt/gdt.asm.o
@@ -109,6 +113,7 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	i686-elf-gcc $(INCLUDES) -I./src/string $(FLAGS) -std=gnu99 -c ./src/string/string.c -o ./build/string/string.o
 
 user_programs:
+	cd ./src/programs/stdlib && $(MAKE) all
 	cd ./src/programs/blank && $(MAKE) all
 
 user_programs_clean:

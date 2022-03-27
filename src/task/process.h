@@ -32,4 +32,5 @@ int process_load_switch(const char* filename, struct process** process);
 int process_load(const char* filename, struct process** process);
 int process_load_for_slot(const char* filename, struct process ** process,int process_slot);
 struct process* process_current();
+void* process_malloc(struct process* process,size_t size);
 #endif
