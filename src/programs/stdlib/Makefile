@@ -1,4 +1,4 @@
-FILES=./start.o ./smollos.o ./smollos.asm.o ./memory.o ./string.o ./stdlib.o ./stdio.o
+FILES=./start.asm.o ./smollos.o ./start.o ./smollos.asm.o ./memory.o ./string.o ./stdlib.o ./stdio.o
 INCLUDES=-I./
 CFLAGS= -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Werror -Wno-unused-label -Wno-cpp -Wno-unused-parameter -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -Iinc
 CPPFLAGS  = -O2 -g -std=gnu++11 -nostdinc++ -fno-rtti
@@ -10,8 +10,8 @@ CPPFLAGS += -DKERNEL -fno-leading-underscore -nostartfiles -fpic -g
 all: ${FILES}
 	i686-elf-ld -m elf_i386 -relocatable ${FILES} -o ./stdlib.elf
 
-./start.o: ./start.asm
-	nasm -f elf ./start.asm -o ./start.o
+./start.asm.o: ./start.asm
+	nasm -f elf ./start.asm -o ./start.asm.o
 
 ./smollos.asm.o: ./smollos.asm
 	nasm -f elf ./smollos.asm -o ./smollos.asm.o
@@ -25,6 +25,10 @@ all: ${FILES}
 ./string.o: ./string.c
 	i686-elf-gcc ${INCLUDES} $(CFLAGS) -std=gnu99 -c ./string.c -o ./string.o
 
+./start.o: ./start.c
+	i686-elf-gcc ${INCLUDES} $(CFLAGS) -std=gnu99 -c ./start.c -o ./start.o
+
+
 ./stdlib.o: ./stdlib.cpp
 	i686-elf-gcc ${INCLUDES} $(CPPFLAGS) -std=gnu++11 -c ./stdlib.cpp -o ./stdlib.o
 
@@ -34,3 +38,4 @@ all: ${FILES}
 clean:
 	rm -rf ${FILES}
 	rm ./stdlib.elf
+	

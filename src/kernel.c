@@ -18,6 +18,7 @@
 #include "./task/process.h"
 #include "./isr80h/isr80h.h"
 #include "./keyboard/keyboard.h"
+//#include "./programs/stdlib/smollos.h"
 
 uint16_t *video_mem = 0;
 uint16_t terminal_row = 0;
@@ -179,6 +180,11 @@ void kernel_main() {
   if(res != SmollOs_ALL_OK){
     panic("failed to load blank.bin");
   }
+  struct command_argument  argument;
+  strcpy(argument.argument,"Testing! this");
+  argument.next = 0x0;
+  int k = process_inject_arguments(process, &argument);
+  if(k){}
   print("loaded\n");
   //print("run first ever task\n");
   task_run_first_ever_task();

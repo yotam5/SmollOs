@@ -47,4 +47,5 @@ int copy_string_from_task(struct task* task,void* virtuall, void*phys, int max);
 uint32_t paging_get(uint32_t* directory,void* virt);
 void *task_get_stack_item(struct task* task, int index);
 int task_page_task(struct task* task);
+void* task_virtual_address_to_physical(struct task* task, void* virtual_address);
 #endif

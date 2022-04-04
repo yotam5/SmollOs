@@ -6,17 +6,14 @@
 
 int main(int argc, char** argv)
 {
-    print("main");
-    char* ptr = (char*)malloc(20);
-    strcpy(ptr, "hello world");
 
-    print(ptr);
-
-    free(ptr);
-
-    ptr[0] = 'B';
-    print("abc\n");
-
+    struct process_arguments arguments;
+    smollos_process_get_arguments(&arguments);
+    for(int i = 0; i < argc;i++)
+    {
+        print(argv[i]);
+        print("\n");
+    }
     while(1) 
     {
     }

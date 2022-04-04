@@ -46,7 +46,7 @@ static int process_find_free_allocation_index(struct process* process)
     int res = -ENOMEM;
     for (int i = 0; i < SmollOs_MAX_PROGRAM_ALLOCATIONS; i++)
     {
-        if (process->allocations[i] == 0)
+        if (process->allocations[i].ptr == 0)
         {
             res = i;
             break;
@@ -75,8 +75,9 @@ void* process_malloc(struct process* process, size_t size)
     {
         goto out_err;
     }
-    
-    process->allocations[index] = ptr;
+
+    process->allocations[index].ptr = ptr;
+    process->allocations[index].size = size;
     return ptr;
 
 out_err:
@@ -91,7 +92,7 @@ static bool process_is_process_pointer(struct process* process, void* ptr)
 {
     for (int i = 0; i < SmollOs_MAX_PROGRAM_ALLOCATIONS; i++)
     {
-        if (process->allocations[i] == ptr)
+        if (process->allocations[i].ptr == ptr)
             return true;
     }
 
@@ -102,21 +103,41 @@ static void process_allocation_unjoin(struct process* process, void* ptr)
 {
     for (int i = 0; i < SmollOs_MAX_PROGRAM_ALLOCATIONS; i++)
     {
-        if (process->allocations[i] == ptr)
+        if (process->allocations[i].ptr == ptr)
         {
-            process->allocations[i] = 0x00;
+            process->allocations[i].ptr = 0x00;
+            process->allocations[i].size = 0;
         }
     }
 }
 
+static struct process_allocation* process_get_allocation_by_addr(struct process* process, void* addr)
+{
+    for (int i = 0; i < SmollOs_MAX_PROGRAM_ALLOCATIONS; i++)
+    {
+        if (process->allocations[i].ptr == addr)
+            return &process->allocations[i];
+    }
+
+    return 0;
+}
+
 void process_free(struct process* process, void* ptr)
 {
-    // Not this processes pointer? Then we cant free it.
-    if (!process_is_process_pointer(process, ptr))
+    // Unlink the pages from the process for the given address
+    struct process_allocation* allocation = process_get_allocation_by_addr(process, ptr);
+    if (!allocation)
     {
+        // Oops its not our pointer.
         return;
     }
 
+    int res = paging_map_to(process->task->page_directory, allocation->ptr, allocation->ptr, paging_align_address(allocation->ptr+allocation->size), 0x00);
+    if (res < 0)
+    {
+        return;
+    }
+    
     // Unjoin the allocation
     process_allocation_unjoin(process, ptr);
 
@@ -328,7 +349,7 @@ int process_load_for_slot(const char* filename, struct process** process, int pr
     // Create a task
     task = task_new(_process);
     int e = ERROR_I(task);
-    if (e == 0)
+    if (e==0)
     {
         res = ERROR_I(task);
         goto out;
@@ -359,3 +380,131 @@ out:
     }
     return res;
 }
+
+void process_get_arguments(struct process* process, int *argc, char*** argv)
+{
+    *argc = process->arguments.argc;
+    *argv = process->arguments.argv;
+}
+
+int process_count_command_arguments(struct command_argument* root_argument)
+{
+    struct command_argument* current = root_argument;
+    int i = 0;
+    while(current)
+    {
+        ++i;
+        current = current->next;
+    }
+    return i;
+}
+
+void process_switch_to_any()
+{
+    for(int i = 0; i < SmollOs_MAX_PROCESSES;i++)
+    {
+        if(processes[i])
+        {
+            process_switch(processes[i]);
+            return;
+        }
+    }
+    panic("no processes to switch too\n");
+}
+static void process_unlink(struct process* process)
+{
+    processes[process->id] = 0x00;
+    if(current_process == process)
+    {
+        process_switch_to_any();
+    }
+}
+
+int process_inject_arguments(struct process* process, struct command_argument* root_argument)
+{
+    int res = 0;
+    struct command_argument* current = root_argument;
+    int i = 0;
+    int argc = process_count_command_arguments(root_argument);
+    if(argc == 0){
+        res = -EIO;
+        goto out;
+    }
+    char **argv = process_malloc(process,sizeof(const char*) * argc);
+    if(!argv)
+    {
+        res = -ENOMEM;
+        goto out;
+    }
+    while(current)
+    {
+        char* argument_str = process_malloc(process,sizeof(current->argument));
+        if(!argument_str)
+        {
+            res = -ENOMEM;
+            goto out;
+        }
+        strncpy(argument_str,current->argument,sizeof(current->argument));
+        argv[i] = argument_str;
+        current = current->next;
+        ++i;
+    }
+    process->arguments.argc = argc;
+    process->arguments.argv = argv;
+    out:
+    return res;
+}
+
+int process_terminate_allocations(struct process* process)
+{
+    for(int i = 0; i < SmollOs_MAX_PROGRAM_ALLOCATIONS;i++)
+    {
+        process_free(process,process->allocations[i].ptr);
+    }
+    return 0;
+}
+
+int process_free_binary_data(struct process* process)
+{
+    kfree(process->ptr);
+    return 0;
+}
+
+int process_free_elf_data(struct process* process)
+{
+    elf_close(process->elf_file);
+    return 0;
+}
+
+int process_free_program_data(struct process* process)
+{
+    int res = 0;
+    switch(process->filetype)
+    {
+        case PROCESS_FILETYPE_BINARY:
+            kfree(process->ptr);
+            break;
+        case PROCESS_FILETYPE_ELF:
+            res = process_free_elf_data(process);
+            break;
+        default:
+            res = -EINVARG;
+    }
+    return res;
+}
+
+int process_terminate(struct process* process)
+{
+    int res = 0;
+    res = process_terminate_allocations(process);
+    if(res < 0){goto out;}
+    kfree(process->stack);
+    res = process_free_program_data(process);
+    if(res < 0){goto out;}
+    kfree(process->stack);
+    task_free(process->task);
+    process_unlink(process);
+out:
+    return 0;
+}
+
