@@ -7,15 +7,16 @@
 int main(int argc, char** argv)
 {
 
-    struct process_arguments arguments;
-    smollos_process_get_arguments(&arguments);
-    for(int i = 0; i < argc;i++)
+    //struct process_arguments arguments;
+    //smollos_process_get_arguments(&arguments);
+
+    /*for(int i = 0; i < argc;i++)
     {
         print(argv[i]);
         print("\n");
-    }
-    while(1) 
-    {
+    }*/
+    while(1){
+    print(argv[0]);
     }
     return 0;
 }

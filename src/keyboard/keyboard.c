@@ -67,3 +67,13 @@ char keyboard_pop()
     process->keyboard.head++;
     return c;
 }
+
+void keyboard_set_capslock(struct keyboard* keyboard,KEYBOARD_CAPS_LOCK_STATE state)
+{
+    keyboard->capslock_state = state;
+}
+
+KEYBOARD_CAPS_LOCK_STATE keyboard_get_capslock(struct keyboard* keyboard)
+{
+    return keyboard->capslock_state;
+}

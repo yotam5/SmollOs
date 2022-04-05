@@ -246,3 +246,14 @@ void* task_get_stack_item(struct task* task, int index)
 
     return result;
 }
+
+void task_next()
+{
+    struct task* next_task = task_get_next();
+    if(!next_task)
+    {
+        panic("no more tasks!\n");
+    }
+    task_switch(next_task);
+    task_return(&next_task->registers);
+}

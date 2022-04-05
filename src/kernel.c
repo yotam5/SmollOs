@@ -176,7 +176,7 @@ void kernel_main() {
   }*/
   print("process switch\n");
   struct process* process = 0;
-  int res = process_load_switch("0:/shell.elf",&process);
+  int res = process_load_switch("0:/blank.elf",&process);
   if(res != SmollOs_ALL_OK){
     panic("failed to load blank.bin");
   }
@@ -184,6 +184,13 @@ void kernel_main() {
   strcpy(argument.argument,"Testing! this");
   argument.next = 0x0;
   int k = process_inject_arguments(process, &argument);
+  int res2 = process_load_switch("0:/blank.elf",&process);
+  if(res2 != SmollOs_ALL_OK){
+    panic("failed to load blank.bin");
+  }
+  strcpy(argument.argument,"abc");
+  int k2 = process_inject_arguments(process, &argument);
+  if(k2){}
   if(k){}
   print("loaded\n");
   //print("run first ever task\n");
