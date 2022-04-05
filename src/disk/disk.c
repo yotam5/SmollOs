@@ -3,7 +3,8 @@
 #include "../memory/memory.h"
 #include "../config.h"
 #include "../status.h"
-
+#include "../string/string.h"
+#include "../kernel.h"
 struct disk disk;
 
 //reads from the disk
@@ -32,6 +33,37 @@ int disk_read_sector(int lba, int total, void *buf){
 	return 0;
 }
 
+int disk_write_sector(int lba, int total, int *buf)
+{
+	outb(0x1F6,(lba >> 24) | 0xE0);
+	outb(0x1F2,total);
+	outb(0x1F3,(unsigned char)(lba & 0xff));
+	outb(0x1F4,(unsigned char)(lba >> 8));
+	outb(0x1F5,(unsigned char)(lba >> 16));
+	outb(0x1F7,0x30);
+
+	//2 bytes at a time, wating for the drive
+	unsigned short* ptr = (unsigned short*) buf;
+	for(int b = 0; b < total;b++){ //wait for buffer to be ready
+		char c = insb(0x1F7);
+		while(!(c&0x08)){
+			c = insb(0x1F7);
+		}
+
+		//copy from hard disk to memory
+		for(int i = 0; i < 256;i++){
+			outw(0x1F0,*ptr++);
+		}
+	}
+	outb(0x1F7,0xE7);
+	while(insb(0x1F7) & (1<< 7))
+	{
+
+	}
+	return 0;
+
+}
+
 void disk_search_and_init()
 {
 	memset(&disk, 0, sizeof(disk));
@@ -51,11 +83,19 @@ struct disk* disk_get(int index)
 
 int disk_read_block(struct disk* idisk, unsigned int lba, int total, void* buf)
 {
+	print("read block\n");
 	if(idisk != &disk)
 	{
-		if(idisk != &disk){
 			return -EIO;
-		}
 	}
 	return disk_read_sector(lba, total, buf);
+}
+
+int disk_write_block(struct disk* idisk, unsigned int lba, int total, void* buf)
+{
+	if(idisk != &disk)
+	{
+		return -EIO;
+	}
+	return disk_write_sector(lba,total,buf);
 }

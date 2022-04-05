@@ -1,7 +1,10 @@
 #include "streamer.h"
 #include "../config.h"
 #include "../memory/heap/kheap.h"
+#include "disk.h"
 #include <stdbool.h>
+#include "../string/string.h"
+#include "../kernel.h"
 struct disk_stream *diskstreamer_new(int disk_id) {
   struct disk *disk = disk_get(disk_id);
   if (!disk) {
@@ -16,6 +19,17 @@ struct disk_stream *diskstreamer_new(int disk_id) {
 int diskstreamer_seek(struct disk_stream *stream, int pos) {
   stream->pos = pos;
   return 0;
+}
+
+int diskstreamer_write(struct disk_stream* stream,void* in,int total)
+{
+  //print("diskstram write\n");
+  int sector = stream->pos / SmollOs_SECTOR_SIZE;
+  //int offset = stream->pos % SmollOs_SECTOR_SIZE;
+  //int total_to_read = total;
+  int res = disk_write_block(stream->disk,sector,1,in);
+
+  return res;
 }
 
 int diskstreamer_read(struct disk_stream *stream, void *out, int total) {

@@ -197,6 +197,8 @@ int fseek(int fd, int offset, FILE_SEEK_MODE whence)
     return res;
 }
 
+
+
 int fread(void* ptr, uint32_t size, uint32_t nmemb, int fd)
 {
     int res = 0;
@@ -217,6 +219,29 @@ int fread(void* ptr, uint32_t size, uint32_t nmemb, int fd)
     out:
     return res;
 }
+
+int fwrite(void* ptr, uint32_t size, uint32_t nmemb, int fd)
+{
+    print("fwrite called\n");
+    int res = 0;
+    if(size == 0 || nmemb == 0 || fd < 1)
+    {
+        print("fwrite error\n");
+        res = -EINVARG;
+        goto out;
+    }
+    struct file_descriptor* desc = file_get_descriptor(fd);
+    if(!desc)
+    {
+        print("file desc error\n");
+        res = -EINVARG;
+        goto out;
+    }
+    res = desc->filesystem->write(desc->disk,desc->_private,size,nmemb,(char*)ptr);
+    out:
+    return res;
+}
+
 
 static int file_free_descriptor(struct file_descriptor* desc){
     file_descriptors[desc->index - 1] = 0x00;

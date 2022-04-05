@@ -159,22 +159,31 @@ void kernel_main() {
   {
 
   }*/
-  /*struct disk_stream* stream = diskstreamer_new(0);
-  diskstreamer_seek(stream,0x201);
-  unsigned char c = 0;
-  diskstreamer_read(stream, &c, 1);*/
+
+  
 
   // outb(0x60, 0xff);
-   /*   struct file_stat s;
+      struct file_stat s;
     print("booted\n");
+    char buf[30];
   int fd = fopen("0:/hello.txt","r");
   if(fd)
   {
     fstat(fd,&s);
+    fread(buf,20,1,fd);
+    print(buf);
+    print("\n");
+    fwrite("HELLO WORLD",20,1,fd);
     fclose(fd);
     print("worked\n");
-  }*/
-  print("process switch\n");
+  }
+  print("\n");
+  fd = fopen("0:/hello.txt","r");
+  char kk[30];
+  fread(kk,20,1,fd);
+  print(kk);
+  print("workd2");
+  /* print("process switch\n");
   struct process* process = 0;
   int res = process_load_switch("0:/blank.elf",&process);
   if(res != SmollOs_ALL_OK){
@@ -196,5 +205,6 @@ void kernel_main() {
   //print("run first ever task\n");
   task_run_first_ever_task();
   //print("end of kernel.c\n");
+  */
   while(1){}
 }

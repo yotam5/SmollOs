@@ -116,11 +116,13 @@ int fat16_read(struct disk* disk, void* descriptor, uint32_t size, uint32_t nmem
 int fat16_seek(void* private,uint32_t offset,FILE_SEEK_MODE seek_mode);
 int fat16_stat(struct disk* disk, void* _private, struct file_stat* stat);
 int fat16_close(void* _private);
+int fat16_write(struct disk* disk, void* descriptor, uint32_t size, uint32_t nmemb,char* in);
 
 struct filesystem fat16_fs = {
     .resolve = fat16_resolve,
     .open = fat16_open,
     .read = fat16_read,
+    .write = fat16_write,
     .seek = fat16_seek,
     .stat = fat16_stat,
     .close = fat16_close
@@ -386,6 +388,36 @@ void fat16_free_directory(struct fat_directory* directory)
     kfree(directory);
 }
 
+static int fat16_write_internal_from_stream(struct disk* disk, struct disk_stream* stream, int cluster,int offset,int total,void* in )
+{
+    //print("write internal from stram\n");
+    int res = 0;
+    struct fat_private* private = disk->fs_private;
+    int size_of_cluster_bytes = private->header.primary_header.sectors_per_cluster * disk->sector_size;
+    int cluster_to_use = fat16_get_cluster_for_offset(disk,cluster,offset);
+    if(cluster_to_use < 0)
+    {
+        res = cluster_to_use;
+        goto out;
+    }
+    int offset_from_cluster = offset % size_of_cluster_bytes;
+    int starting_sector = fat16_cluster_to_sector(private, cluster_to_use);
+    int starting_pos = (starting_sector * disk->sector_size) + offset_from_cluster;
+    int total_to_write = total > size_of_cluster_bytes ? size_of_cluster_bytes : total;
+    res = diskstreamer_seek(stream, starting_pos);
+    if(res != SmollOs_ALL_OK)
+    {
+        goto out;
+    }
+    res = diskstreamer_write(stream, in, total_to_write);
+    if(res != SmollOs_ALL_OK)
+    {
+        goto out;
+    }
+    out:
+    return 0;
+}
+
 static int fat16_read_internal_from_stream(struct disk* disk, struct disk_stream* stream, int cluster,int offset,int total,void* out )
 {
     int res = 0;
@@ -425,6 +457,14 @@ static int fat16_read_internal(struct disk* disk, int starting_cluster, int offs
     struct fat_private* fs_private = disk->fs_private;
     struct disk_stream* stream = fs_private->cluster_read_stream;
     return fat16_read_internal_from_stream(disk,stream,starting_cluster,offset,total,out);
+}
+
+static int fat16_write_internal(struct disk* disk,int starting_cluster, int offset,int total,void* in)
+{
+    //print("write internal called\n");
+    struct fat_private* fs_private = disk->fs_private;
+    struct disk_stream* stream = fs_private->cluster_read_stream;
+    return fat16_write_internal_from_stream(disk,stream,starting_cluster,offset,total,in);
 }
 
 struct fat_directory* fat16_load_fat_directory(struct disk* disk,struct fat_directory_item* item)
@@ -561,6 +601,28 @@ void *fat16_open(struct disk *disk, struct path_part *path, FILE_MODE mode) {
     }
     descriptor->pos = 0;
     return descriptor;
+}
+
+int fat16_write(struct disk* disk, void* descriptor, uint32_t size, uint32_t nmemb,char* in)
+{
+    //print("fat16 write called\n");
+    int res = 0;
+    struct fat_file_descriptor* fat_desc = descriptor;
+    struct fat_directory_item* item = fat_desc->item->item;
+    int offset = fat_desc->pos;
+    for(uint32_t i = 0;i<nmemb;i++)
+    {
+        res = fat16_write_internal(disk, fat16_get_first_cluster(item), offset, size, in);
+        if(ISERR(res))
+        {
+            goto out;
+        }
+        in+=size;
+        offset+=size;
+    }
+    res = nmemb;
+    out:
+    return res;
 }
 
 int fat16_read(struct disk* disk, void* descriptor, uint32_t size, uint32_t nmemb,char* out_ptr)
