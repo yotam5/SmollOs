@@ -26,7 +26,7 @@ SectorsBig          dd 0x773594
 DriveNumber         db 0x80
 WinNtBit            db 0x00
 Signature           db 0x29
-VolumeID            db 0xD105
+VolumeID            db 00000000h
 VolumeIDString      db 'SmollOsBoot'
 SystemIDString      db 'FAT16   '
 
