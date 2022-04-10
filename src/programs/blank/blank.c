@@ -3,7 +3,7 @@
 #include "../stdlib/stdlib.h"
 #include "../stdlib/stdio.h"
 #include "../stdlib/string.h"
-
+extern struct storage_dev_t linux_dev;
 int main(int argc, char** argv)
 {
 
@@ -15,9 +15,15 @@ int main(int argc, char** argv)
         print(argv[i]);
         print("\n");
     }*/
-    print("called ok\n");
-    while(1){
-        
+   
+    print("blank was called\n");
+    //fat16_init(linux_dev, 0);
+    //fat16_init(linux_dev,0);
+    //int t = fat16_open("0:/hello.txt",'r');
+    //if(t)
+    {
+
     }
+    print("blank main has ended\n");
     return 0;
 }

@@ -4,11 +4,12 @@
 int main(int argc, char** argv)
 {
     print("SmollOs v1.0\n");
+    print("> ");
     while(1){
-        print("> ");
-        char buff[1024];
-        smollos_terminal_readline(buff, sizeof(buff), true);
-        smollos_system_run(buff);
+        char buff[1024] = {};
+        if(buff[0]){}
+        //smollos_terminal_readline(buff, sizeof(buff), true);
+        //smollos_system_run(buff);
         //smollos_process_load_start(buff);
         print("\n");
     }

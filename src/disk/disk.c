@@ -8,7 +8,7 @@
 struct disk disk;
 
 //reads from the disk
-int disk_read_sector(int lba, int total, void *buf){
+int disk_read_sector(int lba, int total, const void *buf){
 	outb(0x1F6,(lba >> 24) | 0xE0);
 	outb(0x1F2,total);
 	outb(0x1F3,(unsigned char)(lba & 0xff));
@@ -33,7 +33,7 @@ int disk_read_sector(int lba, int total, void *buf){
 	return 0;
 }
 
-int disk_write_sector(int lba, int total, int *buf)
+int disk_write_sector(int lba, int total, void *buf)
 {
 	outb(0x1F6,(lba >> 24) | 0xE0);
 	outb(0x1F2,total);
@@ -83,7 +83,7 @@ struct disk* disk_get(int index)
 
 int disk_read_block(struct disk* idisk, unsigned int lba, int total, void* buf)
 {
-	print("read block\n");
+	//print("read block\n");
 	if(idisk != &disk)
 	{
 			return -EIO;

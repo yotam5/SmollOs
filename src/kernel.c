@@ -18,6 +18,7 @@
 #include "./task/process.h"
 #include "./isr80h/isr80h.h"
 #include "./keyboard/keyboard.h"
+#include "./fs/fat/fatfs/ff.h"
 //#include "./programs/stdlib/smollos.h"
 
 uint16_t *video_mem = 0;
@@ -150,61 +151,21 @@ void kernel_main() {
   enable_paging();
   isr80h_register_commands();
   keyboard_init();
-  //idt_register_interrupt_callback(0x20, pic_timer_callback);
-  disk_get(0);
 
-  //enable_interrupts();
-  /*struct path_root* root_path = pathparser_parse("0:/bin/shell.exe",NULL);
-  if(root_path)
-  {
-
-  }*/
-
-  
-
-  // outb(0x60, 0xff);
-      struct file_stat s;
-    print("booted\n");
-    char buf[30];
-  int fd = fopen("0:/hello.txt","r");
-  if(fd)
-  {
-    fstat(fd,&s);
-    fread(buf,20,1,fd);
-    print(buf);
-    print("\n");
-    fwrite("HELLO WORLD",20,1,fd);
-    fclose(fd);
-    print("worked\n");
-  }
-  print("\n");
-  fd = fopen("0:/hello.txt","r");
-  char kk[30];
-  fread(kk,20,1,fd);
-  print(kk);
-  print("workd2");
-  /* print("process switch\n");
+  print("process switch\n");
   struct process* process = 0;
-  int res = process_load_switch("0:/blank.elf",&process);
+  int res = process_load_switch("0:/shell.elf",&process);
   if(res != SmollOs_ALL_OK){
-    panic("failed to load blank.bin");
+    panic("failed to load shell.bin");
   }
   struct command_argument  argument;
   strcpy(argument.argument,"Testing! this");
   argument.next = 0x0;
-  int k = process_inject_arguments(process, &argument);
-  int res2 = process_load_switch("0:/blank.elf",&process);
-  if(res2 != SmollOs_ALL_OK){
-    panic("failed to load blank.bin");
-  }
-  strcpy(argument.argument,"abc");
   int k2 = process_inject_arguments(process, &argument);
   if(k2){}
-  if(k){}
   print("loaded\n");
   //print("run first ever task\n");
   task_run_first_ever_task();
   //print("end of kernel.c\n");
-  */
   while(1){}
 }
