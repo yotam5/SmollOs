@@ -10,7 +10,6 @@
 #include "elf.h"
 #include <stdbool.h>
 
-
 const char elf_signature[] = {0x7f, 'E', 'L', 'F'};
 
 static bool elf_valid_signature(void* buffer)

@@ -8,10 +8,12 @@ int main(int argc, char** argv)
     while(1){
         char buff[1024] = {};
         if(buff[0]){}
-        //smollos_terminal_readline(buff, sizeof(buff), true);
+        //smollos_getkeyblock();
+        print("key");
+        smollos_terminal_readline(buff, sizeof(buff), true);
+        //smollos_getkeyblock();
         //smollos_system_run(buff);
         //smollos_process_load_start(buff);
-        print("\n");
     }
     return 0;
 

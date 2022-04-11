@@ -8,7 +8,7 @@ global user_registers
 ; void task_return(struct registers* regs);
 task_return:
     mov ebp, esp
-    ; PUSH THE DATA SEGMENT
+    ; PUSH THE DATA SEGMENT (SS WILL BE FINE)
     ; PUSH THE STACK ADDRESS
     ; PUSH THE FLAGS
     ; PUSH THE CODE SEGMENT
@@ -44,7 +44,7 @@ task_return:
     call restore_general_purpose_registers
     add esp, 4
 
-    ; leave to userland
+    ; Let's leave kernel land and execute in user land!
     iretd
     
 ; void restore_general_purpose_registers(struct registers* regs);
@@ -59,7 +59,7 @@ restore_general_purpose_registers:
     mov ecx, [ebx+20]
     mov eax, [ebx+24]
     mov ebx, [ebx+12]
-    pop ebp
+    add esp, 4
     ret
 
 ; void user_registers()

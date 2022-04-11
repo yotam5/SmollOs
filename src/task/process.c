@@ -10,6 +10,7 @@
 #include "../loader/formats/elf/elf_loader.h"
 #include <stdbool.h>
 
+
 // The current process that is running
 struct process* current_process = 0;
 
@@ -70,7 +71,7 @@ void* process_malloc(struct process* process, size_t size)
         goto out_err;
     }
 
-    int res = paging_map_to(process->task->page_directory, ptr, ptr, paging_align_address(ptr+size), PAGING_IS_WRITABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    int res = paging_map_to(process->task->page_directory, ptr, ptr, paging_align_address(ptr+size), PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
     if (res < 0)
     {
         goto out_err;
@@ -122,6 +123,159 @@ static struct process_allocation* process_get_allocation_by_addr(struct process*
     return 0;
 }
 
+
+int process_terminate_allocations(struct process* process)
+{
+    for (int i = 0; i < SmollOs_MAX_PROGRAM_ALLOCATIONS; i++)
+    {
+        process_free(process, process->allocations[i].ptr);
+    }
+
+    return 0;
+}
+
+int process_free_binary_data(struct process* process)
+{
+    kfree(process->ptr);
+    return 0;
+}
+
+int process_free_elf_data(struct process* process)
+{
+    elf_close(process->elf_file);
+    return 0;
+}
+int process_free_program_data(struct process* process)
+{
+    int res = 0;
+    switch(process->filetype)
+    {
+        case PROCESS_FILETYPE_BINARY:
+            res = process_free_binary_data(process);
+        break;
+
+        case PROCESS_FILETYPE_ELF:
+            res = process_free_elf_data(process);
+        break;
+
+        default:
+            res = -EINVARG;
+    }
+    return res;
+}
+
+void process_switch_to_any()
+{
+    for (int i = 0; i < SmollOs_MAX_PROCESSES; i++)
+    {
+        if (processes[i])
+        {
+            process_switch(processes[i]);
+            return;
+        }
+    }
+
+
+    panic("No processes to switch too\n");
+}
+
+static void process_unlink(struct process* process)
+{
+    processes[process->id] = 0x00;
+
+    if (current_process == process)
+    {
+        process_switch_to_any();
+    }
+}
+
+int process_terminate(struct process* process)
+{
+    int res = 0;
+
+    res = process_terminate_allocations(process);
+    if (res < 0)
+    {
+        goto out;
+    }
+
+    res = process_free_program_data(process);
+    if (res < 0)
+    {
+        goto out;
+    }
+
+    // Free the process stack memory.
+    kfree(process->stack);
+    // Free the task
+    task_free(process->task);
+    // Unlink the process from the process array.
+    process_unlink(process);
+
+out:
+    return res;
+}
+
+void process_get_arguments(struct process* process, int* argc, char*** argv)
+{
+    *argc = process->arguments.argc;
+    *argv = process->arguments.argv;
+}
+
+int process_count_command_arguments(struct command_argument* root_argument)
+{
+    struct command_argument* current = root_argument;
+    int i = 0;
+    while(current)
+    {
+        i++;
+        current = current->next;
+    }
+
+    return i;
+}
+
+
+int process_inject_arguments(struct process* process, struct command_argument* root_argument)
+{
+    int res = 0;
+    struct command_argument* current = root_argument;
+    int i = 0;
+    int argc = process_count_command_arguments(root_argument);
+    if (argc == 0)
+    {
+        res = -EIO;
+        goto out;
+    }
+
+    char **argv = process_malloc(process, sizeof(const char*) * argc);
+    if (!argv)
+    {
+        res = -ENOMEM;
+        goto out;
+    }
+
+
+    while(current)
+    {
+        char* argument_str = process_malloc(process, sizeof(current->argument));
+        if (!argument_str)
+        {
+            res = -ENOMEM;
+            goto out;
+        }
+
+        strncpy(argument_str, current->argument, sizeof(current->argument));
+        argv[i] = argument_str;
+        current = current->next;
+        i++;
+    }
+
+    process->arguments.argc = argc;
+    process->arguments.argv = argv;
+out:
+    return res;
+}
 void process_free(struct process* process, void* ptr)
 {
     // Unlink the pages from the process for the given address
@@ -137,7 +291,7 @@ void process_free(struct process* process, void* ptr)
     {
         return;
     }
-    
+
     // Unjoin the allocation
     process_allocation_unjoin(process, ptr);
 
@@ -147,6 +301,7 @@ void process_free(struct process* process, void* ptr)
 
 static int process_load_binary(const char* filename, struct process* process)
 {
+    void* program_data_ptr = 0x00;
     int res = 0;
     int fd = fopen(filename, "r");
     if (!fd)
@@ -162,7 +317,7 @@ static int process_load_binary(const char* filename, struct process* process)
         goto out;
     }
 
-    void* program_data_ptr = kzalloc(stat.filesize);
+    program_data_ptr = kzalloc(stat.filesize);
     if (!program_data_ptr)
     {
         res = -ENOMEM;
@@ -180,6 +335,13 @@ static int process_load_binary(const char* filename, struct process* process)
     process->size = stat.filesize;
 
 out:
+    if (res < 0)
+    {
+        if (program_data_ptr)
+        {
+            kfree(program_data_ptr);
+        }
+    }
     fclose(fd);
     return res;
 }
@@ -214,7 +376,7 @@ static int process_load_data(const char* filename, struct process* process)
 int process_map_binary(struct process* process)
 {
     int res = 0;
-    paging_map_to(process->task->page_directory, (void*) SmollOs_PROGRAM_VIRTUAL_ADDRESS, process->ptr, paging_align_address(process->ptr + process->size), PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITABLE);
+    paging_map_to(process->task->page_directory, (void*) SmollOs_PROGRAM_VIRTUAL_ADDRESS, process->ptr, paging_align_address(process->ptr + process->size), PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITEABLE);
     return res;
 }
 
@@ -232,7 +394,7 @@ static int process_map_elf(struct process* process)
         int flags = PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL;
         if (phdr->p_flags & PF_W)
         {
-            flags |= PAGING_IS_WRITABLE;
+            flags |= PAGING_IS_WRITEABLE;
         }
         res = paging_map_to(process->task->page_directory, paging_align_to_lower_page((void*)phdr->p_vaddr), paging_align_to_lower_page(phdr_phys_address), paging_align_address(phdr_phys_address+phdr->p_memsz), flags);
         if (ISERR(res))
@@ -266,7 +428,7 @@ int process_map_memory(struct process* process)
     }
 
     // Finally map the stack
-    paging_map_to(process->task->page_directory, (void*)SmollOs_PROGRAM_VIRTUAL_STACK_ADDRESS_END, process->stack, paging_align_address(process->stack+SmollOs_USER_PROGRAM_STACK_SIZE), PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITABLE);
+    paging_map_to(process->task->page_directory, (void*)SmollOs_PROGRAM_VIRTUAL_STACK_ADDRESS_END, process->stack, paging_align_address(process->stack+SmollOs_USER_PROGRAM_STACK_SIZE), PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITEABLE);
 out:
     return res;
 }
@@ -348,8 +510,7 @@ int process_load_for_slot(const char* filename, struct process** process, int pr
 
     // Create a task
     task = task_new(_process);
-    int e = ERROR_I(task);
-    if (e==0)
+    if (ERROR_I(task) == 0)
     {
         res = ERROR_I(task);
         goto out;
@@ -380,131 +541,3 @@ out:
     }
     return res;
 }
-
-void process_get_arguments(struct process* process, int *argc, char*** argv)
-{
-    *argc = process->arguments.argc;
-    *argv = process->arguments.argv;
-}
-
-int process_count_command_arguments(struct command_argument* root_argument)
-{
-    struct command_argument* current = root_argument;
-    int i = 0;
-    while(current)
-    {
-        ++i;
-        current = current->next;
-    }
-    return i;
-}
-
-void process_switch_to_any()
-{
-    for(int i = 0; i < SmollOs_MAX_PROCESSES;i++)
-    {
-        if(processes[i])
-        {
-            process_switch(processes[i]);
-            return;
-        }
-    }
-    panic("no processes to switch too\n");
-}
-static void process_unlink(struct process* process)
-{
-    processes[process->id] = 0x00;
-    if(current_process == process)
-    {
-        process_switch_to_any();
-    }
-}
-
-int process_inject_arguments(struct process* process, struct command_argument* root_argument)
-{
-    int res = 0;
-    struct command_argument* current = root_argument;
-    int i = 0;
-    int argc = process_count_command_arguments(root_argument);
-    if(argc == 0){
-        res = -EIO;
-        goto out;
-    }
-    char **argv = process_malloc(process,sizeof(const char*) * argc);
-    if(!argv)
-    {
-        res = -ENOMEM;
-        goto out;
-    }
-    while(current)
-    {
-        char* argument_str = process_malloc(process,sizeof(current->argument));
-        if(!argument_str)
-        {
-            res = -ENOMEM;
-            goto out;
-        }
-        strncpy(argument_str,current->argument,sizeof(current->argument));
-        argv[i] = argument_str;
-        current = current->next;
-        ++i;
-    }
-    process->arguments.argc = argc;
-    process->arguments.argv = argv;
-    out:
-    return res;
-}
-
-int process_terminate_allocations(struct process* process)
-{
-    for(int i = 0; i < SmollOs_MAX_PROGRAM_ALLOCATIONS;i++)
-    {
-        process_free(process,process->allocations[i].ptr);
-    }
-    return 0;
-}
-
-int process_free_binary_data(struct process* process)
-{
-    kfree(process->ptr);
-    return 0;
-}
-
-int process_free_elf_data(struct process* process)
-{
-    elf_close(process->elf_file);
-    return 0;
-}
-
-int process_free_program_data(struct process* process)
-{
-    int res = 0;
-    switch(process->filetype)
-    {
-        case PROCESS_FILETYPE_BINARY:
-            kfree(process->ptr);
-            break;
-        case PROCESS_FILETYPE_ELF:
-            res = process_free_elf_data(process);
-            break;
-        default:
-            res = -EINVARG;
-    }
-    return res;
-}
-
-int process_terminate(struct process* process)
-{
-    int res = 0;
-    res = process_terminate_allocations(process);
-    if(res < 0){goto out;}
-    kfree(process->stack);
-    res = process_free_program_data(process);
-    if(res < 0){goto out;}
-    kfree(process->stack);
-    task_free(process->task);
-    process_unlink(process);
-out:
-    return 0;
-}
-

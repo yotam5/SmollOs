@@ -5,7 +5,6 @@ global insw
 global outb
 global outw
 
-;input byte
 insb:
     push ebp
     mov ebp, esp
@@ -17,7 +16,6 @@ insb:
     pop ebp
     ret
 
-;input word
 insw:
     push ebp
     mov ebp, esp
@@ -29,7 +27,6 @@ insw:
     pop ebp
     ret
 
-;output byte
 outb:
     push ebp
     mov ebp, esp
@@ -41,7 +38,6 @@ outb:
     pop ebp
     ret
 
-;output word
 outw:
     push ebp
     mov ebp, esp

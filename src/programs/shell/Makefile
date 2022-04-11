@@ -15,4 +15,4 @@ all: ${FILES}
 
 clean:
 	rm -rf ${FILES}
-	rm ./shell.elf
+	rm ./shell.elf || true

@@ -16,8 +16,8 @@ all: ${FILES}
 ./smollos.asm.o: ./smollos.asm
 	nasm -f elf ./smollos.asm -o ./smollos.asm.o
 
-./smollos.o: ./smollos.cpp
-	i686-elf-gcc $(CPPFLAGS) -std=gnu++11 -c ./smollos.cpp -o ./smollos.o
+./smollos.o: ./smollos.c
+	i686-elf-gcc $(CFLAGS) -std=gnu99 -c ./smollos.c -o ./smollos.o
 
 ./memory.o: ./memory.c
 	i686-elf-gcc ${INCLUDES}  $(CFLAGS) -std=gnu99 -c ./memory.c -o ./memory.o
@@ -29,13 +29,14 @@ all: ${FILES}
 	i686-elf-gcc ${INCLUDES} $(CFLAGS) -std=gnu99 -c ./start.c -o ./start.o
 
 
-./stdlib.o: ./stdlib.cpp
-	i686-elf-gcc ${INCLUDES} $(CPPFLAGS) -std=gnu++11 -c ./stdlib.cpp -o ./stdlib.o
+./stdlib.o: ./stdlib.c
+	i686-elf-gcc ${INCLUDES} $(CFLAGS) -std=gnu99 -c ./stdlib.c -o ./stdlib.o
 
-./stdio.o: ./stdio.cpp
-	i686-elf-gcc ${INCLUDES} $(CPPFLAGS) -std=gnu++11 -c ./stdio.cpp -o ./stdio.o
+./stdio.o: ./stdio.c
+	i686-elf-gcc ${INCLUDES} $(CFLAGS) -std=gnu99 -c ./stdio.c -o ./stdio.o
 
 clean:
 	rm -rf ${FILES}
-	rm ./stdlib.elf
+	rm ./stdlib.elf || true
+	rm ../stdlib.elf || true
 	

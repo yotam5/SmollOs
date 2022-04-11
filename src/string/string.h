@@ -1,16 +1,16 @@
 #ifndef STRING_H
 #define STRING_H
-
-#include "stdbool.h"
-
-char tolower(char s1);
-int istrncmp(const char* str1, const char* str2, int n);
-char* strcpy(char* dest,  const char* src);
+#include <stdbool.h>
 int strlen(const char* ptr);
-int tonummericdigit(char c);
+int strnlen(const char* ptr, int max);
 bool isdigit(char c);
-int strnlen(const char *ptr,int max);
+int tonumericdigit(char c);
+char* strcpy(char* dest, const char* src);
+char* strncpy(char* dest, const char* src, int count);
 int strncmp(const char* str1, const char* str2, int n);
-char* strncpy(char* dest, const char* src,int length);
-char *strchr(const char *str, int c);
+int istrncmp(const char* s1, const char* s2, int n);
+int strnlen_terminator(const char* str, int max, char terminator);
+char tolower(char s1);
+char *
+strchr (const char *s, int c);
 #endif

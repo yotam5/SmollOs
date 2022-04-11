@@ -9,6 +9,7 @@
 #include "../memory/paging/paging.h"
 #include "../string/string.h"
 #include "../loader/formats/elf/elf_loader.h"
+
 // The current task that is running
 struct task *current_task = 0;
 
@@ -104,6 +105,18 @@ int task_free(struct task *task)
     return 0;
 }
 
+void task_next()
+{
+    struct task* next_task = task_get_next();
+    if (!next_task)
+    {
+        panic("No more tasks!\n");
+    }
+
+    task_switch(next_task);
+    task_return(&next_task->registers);
+}
+
 int task_switch(struct task *task)
 {
     current_task = task;
@@ -126,13 +139,6 @@ void task_save_state(struct task *task, struct interrupt_frame *frame)
     task->registers.edx = frame->edx;
     task->registers.esi = frame->esi;
 }
-
-void* task_virtual_address_to_physical(struct task* task, void* virtual_address)
-{
-
-    return paging_get_physical_address(task->page_directory->directory_entry,virtual_address);
-}
-
 int copy_string_from_task(struct task* task, void* virtual, void* phys, int max)
 {
     if (max >= PAGING_PAGE_SIZE)
@@ -150,7 +156,7 @@ int copy_string_from_task(struct task* task, void* virtual, void* phys, int max)
 
     uint32_t* task_directory = task->page_directory->directory_entry;
     uint32_t old_entry = paging_get(task_directory, tmp);
-    paging_map(task->page_directory, tmp, tmp, PAGING_IS_WRITABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    paging_map(task->page_directory, tmp, tmp, PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
     paging_switch(task->page_directory);
     strncpy(tmp, virtual, max);
     kernel_page();
@@ -247,13 +253,7 @@ void* task_get_stack_item(struct task* task, int index)
     return result;
 }
 
-void task_next()
+void* task_virtual_address_to_physical(struct task* task, void* virtual_address)
 {
-    struct task* next_task = task_get_next();
-    if(!next_task)
-    {
-        panic("no more tasks!\n");
-    }
-    task_switch(next_task);
-    task_return(&next_task->registers);
+    return paging_get_physical_address(task->page_directory->directory_entry, virtual_address);
 }

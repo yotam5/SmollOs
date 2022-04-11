@@ -7,17 +7,18 @@
 extern "C" {
 #endif
 
+#ifndef PROCESS_H
 struct command_argument
 {
     char argument[512];
     struct command_argument* next;
 };
-
 struct process_arguments
 {
     int argc;
     char** argv;
 };
+#endif
 
 void print(const char* filename);
 

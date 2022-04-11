@@ -19,7 +19,7 @@ static int pathparser_get_drive_by_path(const char** path)
         return -EBADPATH;
     }
 
-    int drive_no = tonummericdigit(*path[0]);
+    int drive_no = tonumericdigit(*path[0]);
 
     // Add 3 bytes to skip drive number 0:/ 1:/ 2:/
     *path += 3;
@@ -29,7 +29,7 @@ static int pathparser_get_drive_by_path(const char** path)
 static struct path_root* pathparser_create_root(int drive_number)
 {
     struct path_root* path_r = kzalloc(sizeof(struct path_root));
-    path_r->drive_number = drive_number;
+    path_r->drive_no = drive_number;
     path_r->first = 0;
     return path_r;
 }
