@@ -9,6 +9,7 @@
 #include "../disk/disk.h"
 #include "../string/string.h"
 #include "../kernel.h"
+
 struct filesystem* filesystems[SmollOs_MAX_FILESYSTEMS];
 struct file_descriptor* file_descriptors[SmollOs_MAX_FILE_DESCRIPTORS];
 

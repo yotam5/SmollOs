@@ -13,6 +13,8 @@
 #include "./gdt/gdt.h"
 #include "./config.h"
 #include "./task/tss.h"
+#include "fs/fat/fatfs/ff.h"
+#include "fs/file.h"
 #include "programs/stdlib/smollos.h"
 #include "status.h"
 #include "stddef.h"
@@ -128,6 +130,7 @@ struct gdt_structured gdt_structured[SmollOs_TOTAL_GDT_SEGMENTS] = {
     {.base = (uint32_t)&tss, .limit=sizeof(tss), .type = 0xE9}      // TSS Segment
 };
 
+FATFS fatfs;
 void kernel_main()
 {
     terminal_initialize();
@@ -145,7 +148,31 @@ void kernel_main()
 
     // Search and initialize the disks
     disk_search_and_init();
+    
+    //initalize fatfs
+    f_mount(&fatfs, "", 0);
 
+    char data[100];
+
+  /*  struct file_stat s;
+  int fd = fopen("0:/hello.txt","r");
+  if(fd)
+  {
+    fread(&data,10,1,fd);
+    print(data);
+    fstat(fd,&s);
+    fclose(fd);
+    print("worked\n");
+  }*/
+    FIL f;
+    print("\n");
+    int n = f_open(&f,"hello.txt",FA_READ);
+    if(n){}
+    int k = f_read(&f,&data,40,NULL);
+    if(k){}
+    print(data);
+    print("\n");
+    f_close(&f);
     // Initialize the interrupt descriptor table
     idt_init();
 

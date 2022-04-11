@@ -150,10 +150,10 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	i686-elf-gcc $(INCLUDES) -I./src/fs -I./src/fat $(FLAGS) -std=gnu99 -c ./src/fs/fat/fat16.c -o ./build/fs/fat/fat16.o
 
 ./build/fs/fat/diskfs.o: ./src/fs/fat/fatfs/diskio.c
-	i686-elf-gcc $(INCLUDES) -I./src/fs -I./src/fat $(FLAGS) -Os -s -std=gnu99 -c ./src/fs/fat/fatfs/diskio.c -o ./build/fs/fat/diskfs.o
+	i686-elf-gcc $(INCLUDES) -I./src/fs -I./src/fat $(FLAGS) -s -std=gnu99 -c ./src/fs/fat/fatfs/diskio.c -o ./build/fs/fat/diskfs.o
 
 ./build/fs/fat/fat16fs.o: ./src/fs/fat/fatfs/ff.c
-	i686-elf-gcc $(INCLUDES) -I./src/fs -I./src/fat $(FLAGS) -Os -s -std=gnu99 -c ./src/fs/fat/fatfs/ff.c -o ./build/fs/fat/fat16fs.o
+	i686-elf-gcc $(INCLUDES) -I./src/fs -I./src/fat $(FLAGS) -s -std=gnu99 -c ./src/fs/fat/fatfs/ff.c -o ./build/fs/fat/fat16fs.o
 
 ./build/fs/file.o: ./src/fs/file.c
 	i686-elf-gcc $(INCLUDES) -I./src/fs $(FLAGS) -std=gnu99 -c ./src/fs/file.c -o ./build/fs/file.o

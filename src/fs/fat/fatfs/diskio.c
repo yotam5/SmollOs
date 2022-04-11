@@ -10,7 +10,7 @@
 #include "./ff.h" /* Obtains integer types */
 #include "./diskio.h" /* Declarations of disk functions */
 #include "../../../disk/disk.h"
-
+#include "../../../kernel.h"
 /* Definitions of physical drive number for each drive */
 #define DEV_RAM 0 /* Example: Map Ramdisk to physical drive 0 */
 #define DEV_MMC 1 /* Example: Map MMC/SD card to physical drive 1 */
@@ -69,7 +69,7 @@ DRESULT disk_read(BYTE pdrv,  /* Physical drive nmuber to identify the drive */
 ) {
   switch (pdrv) {
   case DEV_RAM:
-    return disk_read_sector(sector, count, buff);
+    return disk_read_sector(sector, count, (void*)buff);
     break;
   case DEV_USB:
     return RES_PARERR;
