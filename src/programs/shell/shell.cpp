@@ -1,57 +1,35 @@
 #include "./shell.h"
 #include "../stdlib/smollos.h"
-#include "../std/memop.h"
 
-class demi
+Shell::Shell()
 {
-private: 
-    int demo;
-public:
-    demi(int f)
-    {
-        this->demo = f;
-    }
-    int get(){return this->demo;}
-};
-
-
-class test
+    print("constructor called\n");
+    this->prompt = "> ";
+    this->shell_version = "SmollOs 1.0\n";
+}
+Shell::~Shell()
 {
-public:
-    test(int a)
+    print("destructor called\n");
+}
+
+void Shell::run()
+{
+    char buff[1024];
+    print(this->shell_version);
+    while(true)
     {
-        print("p was allocated\n");
-        this->p = new demi(a);
+        print(this->prompt);
+        smollos_terminal_readline(buff, sizeof(buff), true);
+        print("\n");
     }
-    int getinter()
-    {
-        return this->p->get();
-    }
-    ~test()
-    {
-        print("p was deleted\n");
-        delete this->p;
-    }
-private:
-    demi *p;
-};
+}
+
+
 int main(int argc, char** argv)
 {
-    test* t = new test(22);
-    int n = t->getinter();
+    Shell sh = Shell();
 
-    print("SmollOs v1.0\n");
-    print("> ");
-    char buff[1024];
-    
-    while(0){
-        smollos_terminal_readline(buff, sizeof(buff), true);
-        print("\n> ");
-        //smollos_getkeyblock();
-        //smollos_system_run(buff);
-        //smollos_process_load_start(buff);
-    }
-    //t->~test();
-    delete t;
+    sh.run();
+    print("program exiting\n");
     return 0;
 }

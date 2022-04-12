@@ -283,6 +283,7 @@ void process_free(struct process* process, void* ptr)
     if (!allocation)
     {
         // Oops its not our pointer.
+        print("allocation doesnt exist\n");
         return;
     }
 

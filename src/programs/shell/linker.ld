@@ -12,19 +12,17 @@ SECTIONS
 	{
 		*(.asm)
 	}
-
 	.rodata : ALIGN(4096)
 	{
-		start_ctors = .;
-		*(SORT(.ctors*))
-		end_ctor = .;
+        start_ctors = .;
+        *(SORT(.ctors*))  /* Note the "SORT" */
+        end_ctors = .;
 
-		start_dtors = .;
-		*(SORT(.dtors*))
-		end_dtors = .;
+        start_dtors = .;
+        *(SORT(.dtors*))
+        end_dtors = .;
 
-
-		*(.rodata)
+        *(.rodata*)
 	}
 
 	.data : ALIGN(4096)
@@ -34,7 +32,14 @@ SECTIONS
 
 	.bss : ALIGN(4096)
 	{
-		*(COMMON)
-		*(.bss)
+        sbss = .;
+        *(COMMON)
+        *(.bss)
+        ebss = .;
 	}
+    /DISCARD/ :
+    {
+        *(.comment)
+        *(.eh_frame) /* discard this, unless you are implementing runtime support for C++ exceptions. */
+    }
 }

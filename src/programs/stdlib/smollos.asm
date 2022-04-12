@@ -11,6 +11,7 @@ global smollos_process_load_start:function
 global smollos_process_get_arguments:function 
 global smollos_system:function
 global smollos_exit:function
+extern _fini
 
 ; void print(const char* filename)
 print:
@@ -105,5 +106,6 @@ smollos_exit:
     mov ebp, esp
     mov eax, 9 ; Command 9 process exit
     int 0x80
+    call _fini
     pop ebp
     ret
