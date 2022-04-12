@@ -1,5 +1,7 @@
 #include "./smollos.h"
 #include "./string.h"
+
+
 struct command_argument* smollos_parse_command(const char* command, int max)
 {
     struct command_argument* root_command = 0;

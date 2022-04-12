@@ -12,8 +12,18 @@ SECTIONS
 	{
 		*(.asm)
 	}
+
 	.rodata : ALIGN(4096)
 	{
+		start_ctors = .;
+		*(SORT(.ctors*))
+		end_ctor = .;
+
+		start_dtors = .;
+		*(SORT(.dtors*))
+		end_dtors = .;
+
+
 		*(.rodata)
 	}
 

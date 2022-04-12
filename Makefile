@@ -113,11 +113,11 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 
 
 ./build/task/process.o: ./src/task/process.c
-	i686-elf-gcc $(INCLUDES) -I./src/task $(FLAGS) -std=gnu99 -c ./src/task/process.c -o ./build/task/process.o
+	i686-elf-gcc $(INCLUDES) -I./src/task $(FLAGS) -std=gnu99 -c  ./src/task/process.c -o ./build/task/process.o
 
 
 ./build/task/task.o: ./src/task/task.c
-	i686-elf-gcc $(INCLUDES) -I./src/task $(FLAGS) -std=gnu99 -c ./src/task/task.c -o ./build/task/task.o
+	i686-elf-gcc $(INCLUDES) -I./src/task $(FLAGS) -std=gnu99 -c -Os ./src/task/task.c -o ./build/task/task.o
 
 ./build/task/task.asm.o: ./src/task/task.asm
 	nasm -f elf -g ./src/task/task.asm -o ./build/task/task.asm.o
@@ -141,19 +141,19 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	nasm -f elf -g ./src/memory/paging/paging.asm -o ./build/memory/paging/paging.asm.o
 
 ./build/disk/disk.o: ./src/disk/disk.c
-	i686-elf-gcc $(INCLUDES) -I./src/disk $(FLAGS) -std=gnu99 -c ./src/disk/disk.c -o ./build/disk/disk.o
+	i686-elf-gcc $(INCLUDES) -I./src/disk $(FLAGS) -std=gnu99 -c -Os ./src/disk/disk.c -o ./build/disk/disk.o
 
 ./build/disk/streamer.o: ./src/disk/streamer.c
-	i686-elf-gcc $(INCLUDES) -I./src/disk $(FLAGS) -std=gnu99 -c ./src/disk/streamer.c -o ./build/disk/streamer.o
+	i686-elf-gcc $(INCLUDES) -I./src/disk $(FLAGS) -std=gnu99 -c -Os ./src/disk/streamer.c -o ./build/disk/streamer.o
 
 ./build/fs/fat/fat16.o: ./src/fs/fat/fat16.c
-	i686-elf-gcc $(INCLUDES) -I./src/fs -I./src/fat $(FLAGS) -std=gnu99 -c ./src/fs/fat/fat16.c -o ./build/fs/fat/fat16.o
+	i686-elf-gcc $(INCLUDES) -I./src/fs -I./src/fat $(FLAGS) -std=gnu99 -c -Os ./src/fs/fat/fat16.c -o ./build/fs/fat/fat16.o
 
 ./build/fs/fat/diskfs.o: ./src/fs/fat/fatfs/diskio.c
-	i686-elf-gcc $(INCLUDES) -I./src/fs -I./src/fat $(FLAGS) -s -std=gnu99 -c ./src/fs/fat/fatfs/diskio.c -o ./build/fs/fat/diskfs.o
+	i686-elf-gcc $(INCLUDES) -I./src/fs -I./src/fat $(FLAGS) -s -Os -std=gnu99 -c ./src/fs/fat/fatfs/diskio.c -o ./build/fs/fat/diskfs.o
 
 ./build/fs/fat/fat16fs.o: ./src/fs/fat/fatfs/ff.c
-	i686-elf-gcc $(INCLUDES) -I./src/fs -I./src/fat $(FLAGS) -s -std=gnu99 -c ./src/fs/fat/fatfs/ff.c -o ./build/fs/fat/fat16fs.o
+	i686-elf-gcc $(INCLUDES) -I./src/fs -I./src/fat $(FLAGS) -s -Os -std=gnu99 -c ./src/fs/fat/fatfs/ff.c -o ./build/fs/fat/fat16fs.o
 
 ./build/fs/file.o: ./src/fs/file.c
 	i686-elf-gcc $(INCLUDES) -I./src/fs $(FLAGS) -std=gnu99 -c ./src/fs/file.c -o ./build/fs/file.o
@@ -168,7 +168,7 @@ user_programs:
 	cd ./src/programs/stdlib && $(MAKE) all
 	cd ./src/programs/blank && $(MAKE) all
 	cd ./src/programs/shell && $(MAKE) all
-
+	cd ./src/programs/std && $(MAKE) all
 user_programs_clean:
 	cd ./src/programs/stdlib && $(MAKE) clean
 	cd ./src/programs/blank && $(MAKE) clean
