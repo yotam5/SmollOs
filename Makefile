@@ -29,14 +29,15 @@ FILES = ./build/kernel.asm.o \
 ./build/memory/paging/paging.asm.o\
 ./build/isr80h/heap.o \
 ./build/fs/fat/diskfs.o \
-./build/fs/fat/fat16fs.o
+./build/fs/fat/fat16fs.o \
 
 INCLUDES = -I./src
 FLAGS = -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Werror -Wno-unused-label -Wno-cpp -Wno-unused-parameter -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -Iinc
 
-all: ./bin/boot.bin ./bin/kernel.bin user_programs
+all: ./bin/boot.bin ./bin/kernel.bin ./bin/stagetwo.bin user_programs
 	rm -rf ./bin/os.bin
 	dd if=./bin/boot.bin >> ./bin/os.bin
+	dd if=./bin/stagetwo.bin >> ./bin/os.bin
 	dd if=./bin/kernel.bin >> ./bin/os.bin
 	dd if=/dev/zero bs=1048576 count=18 >> ./bin/os.bin
 	sudo mount -t vfat ./bin/os.bin /mnt/d
@@ -59,6 +60,9 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 
 ./bin/boot.bin: ./src/boot/boot.asm
 	nasm -f bin ./src/boot/boot.asm -o ./bin/boot.bin
+
+./bin/stagetwo.bin: ./src/boot/stagetwo.asm
+	nasm -f bin ./src/boot/stagetwo.asm -o ./bin/stagetwo.bin
 
 ./build/kernel.asm.o: ./src/kernel.asm
 	nasm -f elf -g ./src/kernel.asm -o ./build/kernel.asm.o
@@ -178,5 +182,6 @@ clean: user_programs_clean
 	rm -rf ./bin/boot.bin
 	rm -rf ./bin/kernel.bin
 	rm -rf ./bin/os.bin
+	rm -rf ./bin/stagetwo.bin
 	rm -rf ${FILES}
 	rm -rf ./build/kernelfull.o
