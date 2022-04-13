@@ -30,14 +30,16 @@ FILES = ./build/kernel.asm.o \
 ./build/isr80h/heap.o \
 ./build/fs/fat/diskfs.o \
 ./build/fs/fat/fat16fs.o \
+./crtbegin.o \
+./crtend.o
 
 INCLUDES = -I./src
 FLAGS = -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Werror -Wno-unused-label -Wno-cpp -Wno-unused-parameter -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -Iinc
 
-all: ./bin/boot.bin ./bin/kernel.bin ./bin/stagetwo.bin user_programs
+all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	rm -rf ./bin/os.bin
 	dd if=./bin/boot.bin >> ./bin/os.bin
-	dd if=./bin/stagetwo.bin >> ./bin/os.bin
+	#//dd if=./bin/stagetwo.bin >> ./bin/os.bin
 	dd if=./bin/kernel.bin >> ./bin/os.bin
 	dd if=/dev/zero bs=1048576 count=18 >> ./bin/os.bin
 	sudo mount -t vfat ./bin/os.bin /mnt/d
@@ -47,6 +49,12 @@ all: ./bin/boot.bin ./bin/kernel.bin ./bin/stagetwo.bin user_programs
 	sudo cp ./src/programs/shell/shell.elf /mnt/d
 
 	sudo umount /mnt/d
+
+./crtbegin.o: ./src/crti.asm
+	nasm -f elf ./src/crti.asm -o ./crtbegin.o
+
+./crtend.o: ./src/crtn.asm
+	nasm -f elf ./src/crtn.asm -o ./crtend.o
 
 ./smollos.o: ./src/programs/stdlib/smollos.c
 	i686-elf-gcc $(INCLUDES) $(FLAGS) -std=gnu99 -c ./src/programs/stdlib/smollos.c -o ./smollos.o

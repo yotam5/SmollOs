@@ -130,6 +130,39 @@ struct gdt_structured gdt_structured[SmollOs_TOTAL_GDT_SEGMENTS] = {
     {.base = (uint32_t)&tss, .limit=sizeof(tss), .type = 0xE9}      // TSS Segment
 };
 
+FRESULT scan_files (
+    char* path        /* Start node to be scanned (***also used as work area***) */
+)
+{
+    FRESULT res;
+    DIR dir;
+    UINT i;
+    static FILINFO fno;
+
+
+    res = f_opendir(&dir, path);                       /* Open the directory */
+    if (res == FR_OK) {
+        for (int k = 0; k< 4;k++) {
+            res = f_readdir(&dir, &fno);                   /* Read a directory item */
+            if (res != FR_OK || fno.fname[0] == 0) break;  /* Break on error or end of dir */
+            if (fno.fattrib & AM_DIR) {                    /* It is a directory */
+                i = strlen(path);
+                //print(fno.fname);
+                //print("\n");
+                res = scan_files(path);                    /* Enter the directory */
+                if (res != FR_OK) break;
+                path[i] = 0;
+            } else {                                       /* It is a file. */
+                print(fno.fname);
+                print("\n");
+            }
+        }
+        f_closedir(&dir);
+    }
+
+    return res;
+}
+
 FATFS fatfs;
 void kernel_main()
 {
@@ -148,12 +181,34 @@ void kernel_main()
 
     // Search and initialize the disks
     disk_search_and_init();
-    
+    print("lol\n");
     //initalize fatfs
     f_mount(&fatfs, "", 0);
 
-    char data[100];
-
+    FIL fil;
+    f_open(&fil,"/new.txt",FA_CREATE_NEW);
+    f_write(&fil, "hello new file", 12, NULL);
+    print("loli\n");
+    f_close(&fil);
+    FIL f2;
+    f_open(&f2,"/new.txt",FA_WRITE);
+    print("loli2\n");
+    f_write(&f2, "my new text", 10,NULL);
+    f_close(&f2);
+    FIL f3;
+    f_open(&f3,"/new.txt",FA_READ);
+    char n[100];
+    f_read(&f3,&n,10,NULL);
+    print(n);
+    f_close(&f3);
+    print("loli3\n");
+    scan_files("/");
+    char buff[100];
+    print("loli4\n");
+    print("file was read\n");
+    f_read(&fil,&buff,12,NULL);
+    print(buff);
+    print("loli5\n");
   /*  struct file_stat s;
   int fd = fopen("0:/hello.txt","r");
   if(fd)
@@ -164,16 +219,8 @@ void kernel_main()
     fclose(fd);
     print("worked\n");
   }*/
-    FIL f;
-    print("\n");
-    int n = f_open(&f,"hello.txt",FA_READ);
-    if(n){}
-    int k = f_read(&f,&data,40,NULL);
-    if(k){}
-    print(data);
-    print("\n");
-    f_close(&f);
     // Initialize the interrupt descriptor table
+    
     idt_init();
 
     // Setup the TSS

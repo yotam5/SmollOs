@@ -52,7 +52,8 @@ int disk_write_sector(int lba, int total,const void *buf)
 
 		//copy from hard disk to memory
 		for(int i = 0; i < 256;i++){
-			outw(0x1F0,*ptr++);
+			outw(0x1F0,*ptr);
+			++ptr;
 		}
 	}
 	outb(0x1F7,0xE7);

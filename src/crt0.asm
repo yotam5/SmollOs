@@ -1,16 +1,19 @@
 [BITS 32]
 
+section .asm
 global _start
 extern c_start
 extern smollos_exit
 extern _fini
 extern _init
-section .asm
+
 
 _start:
-
+    push esi
+    push edi
     call _init
+    pop edi
+    pop esi
     call c_start
-    call _fini
     call smollos_exit
     ret

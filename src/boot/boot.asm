@@ -1,11 +1,13 @@
+BITS 16
 ORG 0x7c00
-[BITS 16]
 
+CODE_SEG equ gdt_code - gdt_start
+DATA_SEG equ gdt_data - gdt_start
 jmp short start
 nop
 
 ; FAT16 Header
-OEMIdentifier           db 'KKKKKKK '
+OEMIdentifier           db 'SmollOs '
 BytesPerSector          dw 0x200
 SectorsPerCluster       db 0x80
 ReservedSectors         dw 200
@@ -24,123 +26,124 @@ DriveNumber             db 0x80
 WinNTBit                db 0x00
 Signature               db 0x29
 VolumeID                dd 0xD105
-VolumeIDString          db 'KKKKKKK BOO'
+VolumeIDString          db 'SmollOs xxx'
 SystemIDString          db 'FAT16   '
-
 start:
-mov byte [drive_num], dl	; DL contains initial drive # on boot
+    jmp 0:step2
 
-    ;; READ 2ND STAGE BOOTLOADER INTO MEMORY FIRST
-    mov bl, 02h         ; Will be reading 3 sectors 
-    mov di, 7E00h       ; Memory address to read sectors into
-
-    mov dx, 1F6h        ; Head & drive # port
-    mov al, [drive_num] ; Drive # - hard disk 1
-    and al, 0Fh         ; Head # (low nibble)
-    or al, 0A0h         ; default high nibble to 'primary' drive (drive 1), 'secondary' drive (drive 2) would be hex B or 1011b
-    out dx, al          ; Send head/drive #
-
-    mov dx, 1F2h        ; Sector count port
-    mov al, 03h         ; # of sectors to read
-    out dx, al
-
-    mov dx, 1F3h        ; Sector # port
-    mov al, 2h          ; Sector to start reading at (sectors are 1-based)
-    out dx, al
-
-    mov dx, 1F4h        ; Cylinder low port
-    xor al, al          ; Cylinder low #
-    out dx, al
-
-    mov dx, 1F5h        ; Cylinder high port
-    xor al, al          ; Cylinder high #
-    out dx, al
-
-    mov dx, 1F7h        ; Command port (writing port 1F7h)
-    mov al, 20h         ; Read with retry
-    out dx, al
-
-;; Poll status port after reading 1 sector
-second_stage_loop:
-    in al, dx           ; Status register (reading port 1F7h)
-    test al, 8          ; Sector buffer requires servicing
-    je second_stage_loop     ; Keep trying until sector buffer is ready
-
-    mov cx, 256         ; # of words to read for 1 sector
-    mov dx, 1F0h        ; Data port, reading 
-    rep insw            ; Read bytes from DX port # into DI, CX # of times
-    
-    ;; 400ns delay - Read alternate status register
-    mov dx, 3F6h
-    in al, dx
-    in al, dx
-    in al, dx
-    in al, dx
-
-    cmp bl, 0
-    je load_filetable
-
-    dec bl
-    mov dx, 1F7h
-    jmp second_stage_loop
-
-    ;; READ FILE TABLE INTO MEMORY SECOND
-load_filetable:
-    mov dx, 1F6h        ; Head & drive # port
-    mov al, [drive_num] ; Drive # - hard disk 1
-    and al, 0Fh         ; Head # (low nibble)
-    or al, 0A0h         ; default high nibble to 'primary' drive (drive 1), 'secondary' drive (drive 2) would be hex B or 1011b
-    out dx, al          ; Send head/drive #
-
-    mov dx, 1F2h        ; Sector count port
-    mov al, 1           ; # of sectors to read
-    out dx, al
-
-    mov dx, 1F3h        ; Sector # port
-    mov al, 13h         ; Sector # to start reading at (1-based)
-    out dx, al
-
-    mov dx, 1F4h        ; Cylinder low port
-    xor al, al          ; Cylinder low #
-    out dx, al
-
-    mov dx, 1F5h        ; Cylinder high port
-    xor al, al          ; Cylinder high #
-    out dx, al
-
-    mov dx, 1F7h        ; Command port (writing port 1F7h)
-    mov al, 20h         ; Read with retry
-    out dx, al
-
-.loop:
-    in al, dx           ; Status register (reading port 1F7h)
-    test al, 8          ; Sector buffer requires servicing
-    je .loop            ; Keep trying until sector buffer is ready
-
-    xor ax, ax
+step2:
+    cli ; Clear Interrupts
+    mov ax, 0x00
+    mov ds, ax
     mov es, ax
-    mov di, 1000h       ; Memory address to read sector into (0000h:1000h)
-    mov cx, 256         ; # of words to read for 1 sector
-    mov dx, 1F0h        ; Data port, reading 
-    rep insw            ; Read bytes from DX port # into DI, CX # of times
+    mov ss, ax
+    mov sp, 0x7c00
+    sti ; Enables Interrupts
 
-    ;; 400ns delay - Read alternate status register
-    mov dx, 3F6h
+.load_protected:
+    cli
+    lgdt[gdt_descriptor]
+    mov eax, cr0
+    or eax, 0x1
+    mov cr0, eax
+    jmp CODE_SEG:load32
+    
+; GDT
+gdt_start:
+gdt_null:
+    dd 0x0
+    dd 0x0
+
+; offset 0x8
+gdt_code:     ; CS SHOULD POINT TO THIS
+    dw 0xffff ; Segment limit first 0-15 bits
+    dw 0      ; Base first 0-15 bits
+    db 0      ; Base 16-23 bits
+    db 0x9a   ; Access byte
+    db 11001111b ; High 4 bit flags and the low 4 bit flags
+    db 0        ; Base 24-31 bits
+
+; offset 0x10
+gdt_data:      ; DS, SS, ES, FS, GS
+    dw 0xffff ; Segment limit first 0-15 bits
+    dw 0      ; Base first 0-15 bits
+    db 0      ; Base 16-23 bits
+    db 0x92   ; Access byte
+    db 11001111b ; High 4 bit flags and the low 4 bit flags
+    db 0        ; Base 24-31 bits
+
+gdt_end:
+
+gdt_descriptor:
+    dw gdt_end - gdt_start-1
+    dd gdt_start
+ 
+ [BITS 32]
+ load32:
+    mov eax, 1
+    mov ecx, 100
+    mov edi, 0x0100000
+    call ata_lba_read
+    jmp CODE_SEG:0x0100000
+
+ata_lba_read:
+    mov ebx, eax, ; Backup the LBA
+    ; Send the highest 8 bits of the lba to hard disk controller
+    shr eax, 24
+    or eax, 0xE0 ; Select the  master drive
+    mov dx, 0x1F6
+    out dx, al
+    ; Finished sending the highest 8 bits of the lba
+
+    ; Send the total sectors to read
+    mov eax, ecx
+    mov dx, 0x1F2
+    out dx, al
+    ; Finished sending the total sectors to read
+
+    ; Send more bits of the LBA
+    mov eax, ebx ; Restore the backup LBA
+    mov dx, 0x1F3
+    out dx, al
+    ; Finished sending more bits of the LBA
+
+    ; Send more bits of the LBA
+    mov dx, 0x1F4
+    mov eax, ebx ; Restore the backup LBA
+    shr eax, 8
+    out dx, al
+    ; Finished sending more bits of the LBA
+
+    ; Send upper 16 bits of the LBA
+    mov dx, 0x1F5
+    mov eax, ebx ; Restore the backup LBA
+    shr eax, 16
+    out dx, al
+    ; Finished sending upper 16 bits of the LBA
+
+    mov dx, 0x1f7
+    mov al, 0x20
+    out dx, al
+
+    ; Read all sectors into memory
+.next_sector:
+    push ecx
+
+; Checking if we need to read
+.try_again:
+    mov dx, 0x1f7
     in al, dx
-    in al, dx
-    in al, dx
-    in al, dx
+    test al, 8
+    jz .try_again
 
+; We need to read 256 words at a time
+    mov ecx, 256
+    mov dx, 0x1F0
+    rep insw
+    pop ecx
+    loop .next_sector
+    ; End of reading sectors into memory
+    ret
 
-
-    ; Jump to 2nd stage bootloader here
-    load_2ndstage:
-        mov dl, [drive_num]
-        jmp 0000h:7E00h
-
-;; VARIABLES
-drive_num: db 0
-
-;; Boot sector magic
-times 510-($-$$) db 0   ; pads out 0s until we reach 510th byte
-dw 0AA55h               ; BIOS magic number; BOOT magic #
+times 510-($ - $$) db 0
+dw 0xAA55
