@@ -1,6 +1,7 @@
 #ifndef SHELL_H
 #define SHELL_H
 #include "../std/memop.h"
+#include "../std/string.h"
 
 class Shell
 {
@@ -8,17 +9,11 @@ public:
     Shell();
     ~Shell();
     void run();
-char* getShellVersion() 
-{
-    return this->shell_version;
-}
-char* getPrompt() 
-{
-    return this->prompt;
-}
+String getShellVersion() const;
+String getPrompt() const;
 private:
-    char* shell_version;
-    char* prompt;
+    String shell_version;
+    String prompt;
 };
 
 #endif

@@ -178,13 +178,15 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 
 user_programs:
 	cd ./src/programs/stdlib && $(MAKE) all
+	cd ./src/programs/std && $(MAKE) all
 	cd ./src/programs/blank && $(MAKE) all
 	cd ./src/programs/shell && $(MAKE) all
-	cd ./src/programs/std && $(MAKE) all
+
 user_programs_clean:
 	cd ./src/programs/stdlib && $(MAKE) clean
 	cd ./src/programs/blank && $(MAKE) clean
 	cd ./src/programs/shell && $(MAKE) clean
+	cd ./src/programs/std && $(MAKE) clean
 
 clean: user_programs_clean
 	rm -rf ./bin/boot.bin

@@ -21,7 +21,7 @@
 #include "./task/task.h"
 #include "./isr80h/isr80h.h"
 #include "./keyboard/keyboard.h"
-//#include "./fs/fat/fatfs/ff.h"
+#include <cpuid.h>
 //#include "./programs/stdlib/smollos.h"
 
 uint16_t* video_mem = 0;
@@ -181,11 +181,11 @@ void kernel_main()
 
     // Search and initialize the disks
     disk_search_and_init();
-    print("lol\n");
+    //print("lol\n");
     //initalize fatfs
     f_mount(&fatfs, "", 0);
-
-    FIL fil;
+    
+    /*FIL fil;
     f_open(&fil,"/new.txt",FA_CREATE_NEW);
     f_write(&fil, "hello new file", 12, NULL);
     print("loli\n");
@@ -202,13 +202,15 @@ void kernel_main()
     print(n);
     f_close(&f3);
     print("loli3\n");
-    scan_files("/");
     char buff[100];
     print("loli4\n");
     print("file was read\n");
     f_read(&fil,&buff,12,NULL);
     print(buff);
     print("loli5\n");
+    print("---------------------------");
+    f_mkdir("/home");
+    scan_files("/");*/
   /*  struct file_stat s;
   int fd = fopen("0:/hello.txt","r");
   if(fd)
