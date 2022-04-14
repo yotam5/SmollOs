@@ -1,22 +1,56 @@
 #include "./memop.h"
 #include "./string.h"
+#include "../../memory/memory.h"
 
+#define STRING_DEBUG 0
+
+String::String(const int initial)
+{
+    if(initial >= 0){
+        this->length = 0;
+        this->data = new char[initial];
+        this->available = initial;
+    }
+    else{
+        print("NEGATIVE VALUE\n");
+        this->length = 0;
+        this->data = new char[0];
+        this->available = 0;
+    }
+}
+
+String::String(const unsigned initial)
+{
+    this->length = 0;
+    data = new char[this->length];
+    this->available = initial;
+}
 
 String::String()
 {
+    #if STRING_DEBUG
+    print("String()\n");
+    #endif
     this->length = 0;
     data = new char[0];
+    this->available = 0;
 }
 
 String::String(char c)
 {
+    #if STRING_DEBUG
+    print("String(char)\n");
+    #endif
     this->length = 1;
     data = new char(c);
+    this->available = 0;
 }
 
 String::String(const char* c)
 {
-    print("const char* c\n");
+    #if STRING_DEBUG
+    print("String(const char*)\n");
+    #endif
     if(c)
     {
         unsigned n = 0;
@@ -28,16 +62,20 @@ String::String(const char* c)
         for(unsigned i = 0;i < this->length;i++){
             this->data[i] = c[i];
         }
+        this->available = 0;
     }
     else{
         this->length = 0;
         this->data = 0;
+        this->available = 0;
     }
 }
 
 String::String(char* c)
 {
-    print("char* c\n");
+    #if STRING_DEBUG
+    print("String(char*)\n");
+    #endif
     if(c)
     {
         unsigned n = 0;
@@ -49,34 +87,46 @@ String::String(char* c)
         for(unsigned i = 0;i < this->length;i++){
             this->data[i] = c[i];
         }
+        this->available = 0;
     }
     else{
         this->length = 0;
         this->data = 0;
     }
+    this->available = 0;
 }
 
 String::String(const String& s)
 {
+    #if STRING_DEBUG
+    print("String(const Sring&)\n");
+    #endif
     this->length = s.length;
     this->data = new char[this->length];
     for(unsigned i = 0;i < this->length;i++){
         this->data[i] = s[i];
     }
+    this->available = s.available;
 }
 
 String::String(String& s)
 {
+    #if STRING_DEBUG
+    print("String(String&)\n");
+    #endif
     this->length = s.length;
     this->data = new char[this->length];
     for(unsigned i = 0;i < this->length;i++){
         this->data[i] = s[i];
     }
+    this->available = s.available;
 }
 
 String::~String()
 {
-    print("destructor str\n");
+    #if STRING_DEBUG
+    print("~String()\n");
+    #endif
     delete[] this->data;
 }
 
@@ -84,6 +134,12 @@ unsigned String::len() const
 {
     return this->length;
 }
+
+unsigned String::getAvailable() const
+{
+    return this->available;
+}
+
 
 int String::index(char c) const 
 {
@@ -143,6 +199,16 @@ char& String::operator[](unsigned i)
     return this->data[0];   
 }
 
+String& String::operator+=(const char c)
+{
+    if(this->available > 0)
+    {
+        --this->available;
+        this->data[this->length++] = c;
+    }
+    return *this;
+}
+
 String& String::operator+=(const String &s)
 {
     char* combined = new char[this->length + s.length];
@@ -163,8 +229,7 @@ String& String::operator+=(const String &s)
 
 String operator+(const String&lhs,char rhs)
 {
-    //return String(lhs) + String(rhs);
-    return lhs;
+    return String(lhs) + String(rhs);
 }
 
 String operator+(const String&lhs,const char* rhs)
@@ -247,6 +312,32 @@ bool operator!=(const char*lhs,const String&rhs)
     return !(lhs == rhs);
 }
 
+void String::erase(unsigned pos,unsigned count)
+{
+    #if STRING_DEBUG
+    print("erase called\n");
+    #endif
+    if(pos + count >= this->length)
+    {
+        return;
+    }
+    int offset = pos + count;
+    for(unsigned i = pos ;i < count;i++)
+    {
+        this->data[i] = this->data[offset];
+        this->data[offset] =' ';
+        ++offset;
+    }
+    char* resPtr = new char(this->length - count);
+    this->length -= count;
+    memcpy((void*)resPtr,this->data,this->length);
+    delete[] this->data;
+    #if STRING_DEBUG
+    print("data was deleted\n");
+    #endif
+    this->data = resPtr;
+}
+
 char* String::c_str() const
 {
     char* ptr = new char[this->length+1];
@@ -254,6 +345,5 @@ char* String::c_str() const
         ptr[i] = this->data[i];
     }
     ptr[this->length] = '\0';
-    print(ptr);
     return ptr;
 }

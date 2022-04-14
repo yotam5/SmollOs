@@ -1,8 +1,8 @@
 
 #include "../stdlib/smollos.h"
-#include "../stdlib/stdlib.h"
+#include <stdint.h>
 #include "../stdlib/stdio.h"
-#include "../stdlib/string.h"
+#include "../std/vga.h"
 
 int main(int argc, char** argv)
 {
@@ -17,7 +17,7 @@ int main(int argc, char** argv)
     }*/
     //print("called ok\n");
     while(1){
-        //print("monke1\n");
+        //print("monke1 ");
         //smollos_getkeyblock();
         //print("monkeee\n");
     }

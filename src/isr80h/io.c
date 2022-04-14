@@ -28,7 +28,7 @@ void* isr80h_command3_putchar(struct interrupt_frame* frame)
 
 void* isr80h_command10_putchar(struct interrupt_frame* frame)
 {
-    print("was called\n");
+    //print("was called\n");
     int x = (int)task_get_stack_item(task_current(), 0);
     int y = (int)task_get_stack_item(task_current(), 1);
     int c = (int)task_get_stack_item(task_current(), 2);

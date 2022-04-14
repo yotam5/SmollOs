@@ -16,9 +16,10 @@ all: ${FILES}
 	i686-elf-gcc ${INCLUDES} $(CPPFLAGS) -c ./memop.cpp -o ./memop.o
 
 ./vga.o: ./vga.cpp
-	i686-elf-gcc ${INCLUDES} $(CPPFLAGS) -c ./vga.cpp -o ./vga.o
+	i686-elf-gcc ${INCLUDES} $(CPPFLAGS) -c ./vga.cpp -o ./vga.o 
 
 clean:
 	rm -rf ${FILES}
 	rm ./memop.o || true
 	rm ./string.o || true
+	rm ./vga.o || true

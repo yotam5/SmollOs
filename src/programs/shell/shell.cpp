@@ -4,46 +4,92 @@
 #include "../stdlib/stdio.h"
 #include "../std/vga.h"
 
+#define SHELL_DEBUG 0
 Shell::Shell()
 :
 shell_version("SmollOs 1.0\n"),
-prompt("> ")
+prompt(">"),
+line(1024),
+graphics(20,80),
+current_x(0),
+current_y(0)
 {
     /*
     note: if not initialize in : then will be deleted unless using new
     */
+
+    #if SHELL_DEBUG
     print("constructor called\n");
     print("constructor finished\n");
+    #endif
 }
 Shell::~Shell()
 {
+    #if SHELL_DEBUG
     print("destructor called\n");
+    #endif
+}
+
+void Shell::displayPrompt(Colors color=Colors::VGA_GREEN) const
+{
+
+}
+
+
+void Shell::shell_readline(String& str,bool show_while_typing=true)
+{
+    char key;
+    while(key != 13)
+    {
+        key = smollos_getkeyblock();
+        if(show_while_typing)
+        {
+            switch(key)
+            {
+                case 0x8:
+                    str.erase(str.len()-1, 1);
+                    if(show_while_typing){
+                        this->graphics.putCharAt(this->current_x,this->current_y,' ',Colors::VGA_BLACK);
+                        this->current_x == 1 ? this->current_x : --this->current_x;
+                    }
+                break;
+                default:
+                    this->graphics.putCharAt(this->current_x++,this->current_y,key,Colors::VGA_GREEN);
+                    str += key;
+                break;
+            }
+        }
+    }
+    //print(str.c_str());
+    ++this->current_y;
 }
 
 void Shell::run()
 {    
-    char buff[1024];
-    print(this->shell_version.c_str());
+    //print(this->shell_version.c_str());
     while(true)
     {
-        print(this->prompt.c_str());
-        smollos_terminal_readline(buff, sizeof(buff), true);
-        print("\n");
+        this->graphics.putStringAt(this->current_x++,this->current_y,this->prompt,Colors::VGA_GREEN);
+        this->shell_readline(this->line);
+        ++this->current_y;
+        this->current_x = 0;
+        this->graphics.cls();
+        this->current_y = 0;
     }
 }
 
 int main(int argc, char** argv)
-{
+{   
 
-    print("\nbefore initialize\n");
+    String str = "0123456789";
+
     Shell sh = Shell();
-    Graphics g = Graphics();
-    g.putCharAt(0, 0, 'K', Colors::VG_WHITE);
     //print("\nafter initialize\n");
     //print("before sh\n");
     //print("after sh\n");
     //sh.run();
-    print("after run\n");
+    //smollos_terminal_readline(buff, sizeof(buff), true);
+    sh.run();
     print("program exiting\n");
     return 0;
 }

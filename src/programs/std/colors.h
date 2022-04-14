@@ -16,5 +16,5 @@ enum class Colors
   VGA_LIGHT_RED = 12,
   VGA_LIGHT_MAGENTA = 13,
   VGA_LIGHT_BROWN = 14,
-  VG_WHITE = 15
+  VGA_WHITE = 15
 };

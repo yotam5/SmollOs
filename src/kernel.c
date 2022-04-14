@@ -21,7 +21,6 @@
 #include "./task/task.h"
 #include "./isr80h/isr80h.h"
 #include "./keyboard/keyboard.h"
-#include <cpuid.h>
 //#include "./programs/stdlib/smollos.h"
 
 uint16_t* video_mem = 0;
@@ -247,10 +246,12 @@ void kernel_main()
     isr80h_register_commands();
 
     // Initialize all the system keyboards
-    keyboard_init();
-        
+    keyboard_init();    
+    //char buff[1000];
+    //smollos_terminal_readline(buff,sizeof(buff),true);    
+    //smollos_getkeyblock();
     struct process* process = 0;
-    int res = process_load_switch("0:/shell.elf", &process);
+    int res = process_load_switch("0:/blank.elf", &process);
     if (res != SmollOs_ALL_OK)
     {
         panic("Failed to load blank.elf\n");
@@ -263,7 +264,7 @@ void kernel_main()
 
     process_inject_arguments(process, &argument);
 
-    res = process_load_switch("0:/blank.elf", &process);
+    res = process_load_switch("0:/shell.elf", &process);
     if (res != SmollOs_ALL_OK)
     {
         panic("Failed to load blank.elf\n");

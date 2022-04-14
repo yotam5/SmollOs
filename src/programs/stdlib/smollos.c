@@ -65,7 +65,6 @@ void smollos_terminal_readline(char* out, int max, bool output_while_typing)
     for (i = 0; i < max -1; i++)
     {
         char key = smollos_getkeyblock();
-
         // Carriage return means we have read the line
         if (key == 13)
         {
@@ -91,6 +90,7 @@ void smollos_terminal_readline(char* out, int max, bool output_while_typing)
 
     // Add the null terminator
     out[i] = 0x00;
+    print("finished\n");
 }
 
 int smollos_system_run(const char* command)
