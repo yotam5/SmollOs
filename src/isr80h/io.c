@@ -8,7 +8,6 @@ void* isr80h_command1_print(struct interrupt_frame* frame)
     void* user_space_msg_buffer = task_get_stack_item(task_current(), 0);
     char buf[1024];
     copy_string_from_task(task_current(), user_space_msg_buffer, buf, sizeof(buf));
-
     print(buf);
     return 0;
 }
@@ -24,5 +23,16 @@ void* isr80h_command3_putchar(struct interrupt_frame* frame)
 {
     char c = (char)(int) task_get_stack_item(task_current(), 0);
     terminal_writechar(c, 15);
+    return 0;
+}
+
+void* isr80h_command10_putchar(struct interrupt_frame* frame)
+{
+    print("was called\n");
+    int x = (int)task_get_stack_item(task_current(), 0);
+    int y = (int)task_get_stack_item(task_current(), 1);
+    int c = (int)task_get_stack_item(task_current(), 2);
+    uint16_t* video_mem = (uint16_t*)0xB8000;
+    video_mem[(y * 80) + x] = c;
     return 0;
 }

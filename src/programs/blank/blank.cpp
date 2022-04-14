@@ -15,7 +15,7 @@ int main(int argc, char** argv)
         print(argv[i]);
         print("\n");
     }*/
-    print("called ok\n");
+    //print("called ok\n");
     while(1){
         //print("monke1\n");
         //smollos_getkeyblock();

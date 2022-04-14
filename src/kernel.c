@@ -167,6 +167,7 @@ FATFS fatfs;
 void kernel_main()
 {
     terminal_initialize();
+    //terminal_initialize();
     memset(gdt_real, 0x00, sizeof(gdt_real));
     gdt_structured_to_gdt(gdt_real, gdt_structured, SmollOs_TOTAL_GDT_SEGMENTS);
 
@@ -249,7 +250,7 @@ void kernel_main()
     keyboard_init();
         
     struct process* process = 0;
-    int res = process_load_switch("0:/blank.elf", &process);
+    int res = process_load_switch("0:/shell.elf", &process);
     if (res != SmollOs_ALL_OK)
     {
         panic("Failed to load blank.elf\n");
@@ -262,7 +263,7 @@ void kernel_main()
 
     process_inject_arguments(process, &argument);
 
-    res = process_load_switch("0:/shell.elf", &process);
+    res = process_load_switch("0:/blank.elf", &process);
     if (res != SmollOs_ALL_OK)
     {
         panic("Failed to load blank.elf\n");

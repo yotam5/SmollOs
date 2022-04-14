@@ -1,9 +1,13 @@
 #include "./shell.h"
 #include "../stdlib/smollos.h"
+#include <stdint.h>
+#include "../stdlib/stdio.h"
+#include "../std/vga.h"
 
-Shell::Shell() : 
-prompt("> "),
-shell_version("SmollOs 1.0\n")
+Shell::Shell()
+:
+shell_version("SmollOs 1.0\n"),
+prompt("> ")
 {
     /*
     note: if not initialize in : then will be deleted unless using new
@@ -17,10 +21,8 @@ Shell::~Shell()
 }
 
 void Shell::run()
-{
+{    
     char buff[1024];
-    this->shell_version[0] = 'A';
-    this->prompt[0] = '-';
     print(this->shell_version.c_str());
     while(true)
     {
@@ -30,12 +32,18 @@ void Shell::run()
     }
 }
 
-
 int main(int argc, char** argv)
 {
-    Shell sh = Shell();
 
-    sh.run();
+    print("\nbefore initialize\n");
+    Shell sh = Shell();
+    Graphics g = Graphics();
+    g.putCharAt(0, 0, 'K', Colors::VG_WHITE);
+    //print("\nafter initialize\n");
+    //print("before sh\n");
+    //print("after sh\n");
+    //sh.run();
+    print("after run\n");
     print("program exiting\n");
     return 0;
 }

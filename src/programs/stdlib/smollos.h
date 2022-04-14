@@ -2,7 +2,7 @@
 #define SmollOs_H
 #include <stddef.h>
 #include <stdbool.h>
-
+#include <stdint.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -21,17 +21,12 @@ struct process_arguments
 #endif
 
 void print(const char* filename);
-
 int smollos_getkey();
-
 void smollos_process_load_start(const char* filename);
-
 void* smollos_malloc(size_t size);
-
 void* smollos_free(void* ptr);
-
+int user_putchar(uint16_t x,uint16_t y,uint16_t c);
 void* smollos_putchar(char c);
-
 int smollos_system(struct command_argument* arguments);
 int smollos_system_run(const char* command);
 int smollos_getkeyblock();

@@ -9,11 +9,9 @@ extern _init
 
 
 _start:
-    push esi
-    push edi
+
     call _init
-    pop edi
-    pop esi
+
     call c_start
     call smollos_exit
     ret
