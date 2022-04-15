@@ -1,6 +1,11 @@
 #include "./memop.h"
-
+#include "./memop.h"
 void *operator new(size_t size) {
+	return smollos_malloc(size);
+}
+
+void *malloc(size_t size)
+{
 	return smollos_malloc(size);
 }
 

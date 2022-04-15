@@ -4,24 +4,27 @@
 #include "../std/string.h"
 #include "../std/vga.h"
 #include <stdint.h>
-class Shell
-{
+
+namespace shell {
+class Shell {
 public:
-    Shell();
-    ~Shell();
-    void run();
-    String getShellVersion() const;
-    String getPrompt() const;
-    void displayPrompt(Colors);
-    void shell_readline(String& str,bool show_while_typing);
-    void cls();
+  Shell();
+  ~Shell();
+  void run();
+  std::string getShellVersion() const;
+  std::string getPrompt() const;
+  void displayPrompt(Colors);
+  void shell_readline(std::string &str, bool show_while_typing);
+  void cls();
+
 private:
-    String shell_version;
-    String prompt;
-    String line;
-    Graphics graphics;
-    unsigned current_x;
-    unsigned current_y;
+  std::string shell_version;
+  std::string prompt;
+  std::string line;
+  vga::Graphics graphics;
+  unsigned current_x;
+  unsigned current_y;
 };
+} // namespace shell
 
 #endif

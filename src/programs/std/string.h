@@ -1,54 +1,55 @@
 
 
-#ifndef STD_STRING_H
-#define STD_STRING_H
+#ifndef STD_string_H
+#define STD_string_H
 
-class String 
-{
+namespace std {
+
+class string {
 private:
-    char* data;
-    unsigned int length;
-    unsigned int available;
+  char *data;
+  unsigned int length;
+  unsigned int available;
+
 public:
-    String();
-    String(const char* c);
-    String(char* c);
-    String(const String& s);
-    String(String& s);
-    String(const unsigned initial);
-    String(const int);
-    ~String();
-    explicit String(char c);
+  string();
+  string(const char *c);
+  string(char *c);
+  string(const string &s);
+  string(string &s);
+  string(const unsigned initial);
+  string(const int);
+  ~string();
+  explicit string(char c);
 
-    unsigned len() const;
-    unsigned getAvailable() const;
-    int index(char c) const;
-    void upcase(unsigned start, unsigned end);
-    void downcase(unsigned start, unsigned end);
-    void erase(unsigned pos,unsigned amount);
-    char operator[](unsigned i)const;
-    char& operator[](unsigned i);
-    String& operator+=(const String&s);
-    String& operator+=(const char c);
-    char* c_str() const;
-    friend String operator+ (const String& lhs, const String& rhs);
-    friend String operator+ (const String& lhs, char          rhs);
-    friend String operator+ (const String& lhs, const char*   rhs);
-    friend String operator+ (char          lhs, const String& rhs);
-    friend String operator+ (const char*   lhs, const String& rhs);
+  unsigned len() const;
+  unsigned getAvailable() const;
+  int index(char c) const;
+  void upcase(unsigned start, unsigned end);
+  void downcase(unsigned start, unsigned end);
+  void erase(unsigned pos, unsigned amount);
+  char operator[](unsigned i) const;
+  char &operator[](unsigned i);
+  string &operator+=(const string &s);
+  string &operator+=(const char c);
+  char *c_str() const;
+  friend std::string operator+(const std::string &lhs, const std::string &rhs);
+  friend std::string operator+(const std::string &lhs, char rhs);
+  friend std::string operator+(const std::string &lhs, const char *rhs);
+  friend std::string operator+(char lhs, const std::string &rhs);
+  friend std::string operator+(const char *lhs, const std::string &rhs);
 
+  friend bool operator==(const std::string &lhs, const std::string &rhs);
+  friend bool operator==(const std::string &lhs, char rhs);
+  friend bool operator==(const std::string &lhs, const char *rhs);
+  friend bool operator==(char lhs, const std::string &rhs);
+  friend bool operator==(const char *lhs, const std::string &rhs);
 
-    friend bool operator== (const String& lhs, const String& rhs);
-    friend bool operator== (const String& lhs, char          rhs);
-    friend bool operator== (const String& lhs, const char*   rhs);
-    friend bool operator== (char          lhs, const String& rhs);
-    friend bool operator== (const char*   lhs, const String& rhs);
-    
-    friend bool operator!= (const String& lhs, const String& rhs);
-    friend bool operator!= (const String& lhs, char          rhs);
-    friend bool operator!= (const String& lhs, const char*   rhs);
-    friend bool operator!= (char          lhs, const String& rhs);
-    friend bool operator!= (const char*   lhs, const String& rhs);
+  friend bool operator!=(const std::string &lhs, const std::string &rhs);
+  friend bool operator!=(const std::string &lhs, char rhs);
+  friend bool operator!=(const std::string &lhs, const char *rhs);
+  friend bool operator!=(char lhs, const std::string &rhs);
+  friend bool operator!=(const char *lhs, const std::string &rhs);
 };
-
+} // namespace std
 #endif

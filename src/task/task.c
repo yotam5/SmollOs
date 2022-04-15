@@ -8,7 +8,7 @@
 #include "./process.h"
 #include "../memory/paging/paging.h"
 #include "../string/string.h"
-#include "../loader/formats/elf/elf_loader.h"
+#include "../loader/formats/elf/elfloader.h"
 
 // The current task that is running
 struct task *current_task = 0;

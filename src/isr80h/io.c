@@ -38,11 +38,21 @@ void* isr80h_command10_putchar(struct interrupt_frame* frame)
     return 0;
 }
 
-extern FIL* fs_descriptors;
+extern FIL fss_descriptors[10];
 void* isr80h_command11_smollos_fopen(struct interrupt_frame* frame)
 {
-    const char* path = (const char*)task_get_stack_item(task_current(), 0);
-    const int mode = (const int)(task_get_stack_item(task_current(), 1));
+    char buff[1024];
+    void* path_ptr = task_get_stack_item(task_current(), 0);
+    const int mode = (const int)(int)(task_get_stack_item(task_current(), 1));
+    copy_string_from_task(task_current(), path_ptr, buff, sizeof(buff));
     //mode need to be int 1,2,3..
-    return (void*)f_open(fs_descriptors[0], path,mode);
+    print(buff);
+    
+    FRESULT res =  f_open(&fss_descriptors[0], buff,mode);
+    if(res){}
+    char buff2[100];
+    f_read(&fss_descriptors[0],buff2,10,NULL);
+    print(buff2);
+    return 0;
+
 }

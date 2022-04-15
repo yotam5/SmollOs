@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stddef.h>
 #include "heap.h"
 #include "../../kernel.h"
 #include "../../status.h"
@@ -179,4 +180,10 @@ void* heap_malloc(struct heap* heap, size_t size)
 void heap_free(struct heap* heap, void* ptr)
 {
     heap_mark_blocks_free(heap, heap_address_to_block(heap, ptr));
+}
+
+void* heap_realloc(struct heap* heap, void* ptr, size_t size)
+{
+    int starting_block = heap_address_to_block(heap,ptr);
+    
 }

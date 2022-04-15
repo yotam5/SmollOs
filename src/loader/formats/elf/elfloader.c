@@ -1,4 +1,4 @@
-#include "./elf_loader.h"
+#include "./elfloader.h"
 #include "../../../config.h"
 #include "../../../fs/file.h"
 #include "../../../kernel.h"
@@ -9,6 +9,7 @@
 #include "../../../string/string.h"
 #include "elf.h"
 #include <stdbool.h>
+#include "../../../fs/fat/fatfs/ff.h"
 
 const char elf_signature[] = {0x7f, 'E', 'L', 'F'};
 

@@ -126,15 +126,31 @@ user_putchar:
     pop ebp
     ret
 
-;int smollos_fopen(FILE* fil,const char* path,const int mode)
+;int smollos_fopen(const char* path,const int mode)
 smollos_fopen:
     push ebp
     mov ebp,esp
     mov eax,11
-    push dword[ebp + 12]
+    push dword[ebp+12]
     push dword[ebp + 8]
 
     int 0x80
-    add esp,8
+    add esp,12
     pop ebp
     ret
+
+;int fread(int fd,void* buf, int length)
+smollos_fread:
+    push ebp
+    mov ebp,esp
+    push dword[ebp+16]
+    push dword[ebp+12]
+    push dword[ebp+8]
+
+    int 0x80
+    add esp,12
+    pop ebp
+    ret
+
+;void fclose(int fd)
+smollos_fclose:

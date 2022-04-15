@@ -3,7 +3,7 @@
 #include "../heap/kheap.h"
 #include "../../status.h"
 #include "../../config.h"
-#include "../../loader/formats/elf/elf_loader.h"
+#include "../../loader/formats/elf/elfloader.h"
 
 void paging_load_directory(uint32_t *directory);
 

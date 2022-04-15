@@ -11,4 +11,5 @@ void operator delete(void *p);
 void operator delete(void *p, size_t size);
 void operator delete[](void *p);
 void operator delete[](void *p, size_t size);
+void *malloc(size_t size);
 #endif

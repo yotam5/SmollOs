@@ -13,7 +13,7 @@
 
 struct filesystem* filesystems[SmollOs_MAX_FILESYSTEMS];
 struct file_descriptor* file_descriptors[SmollOs_MAX_FILE_DESCRIPTORS];
-FIL* fs_descriptors[10];
+FIL fss_descriptors[10];
 
 static struct filesystem** fs_get_free_filesystem()
 {
