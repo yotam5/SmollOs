@@ -14,6 +14,8 @@ namespace std
         ~Vector();
         T* begin() const;
         T* end() const;
+        const T* cbegin() const;
+        const T* cend() const;
         void push_back(T elem);
         T pop_back();
         T& operator[](size_t index) const;
