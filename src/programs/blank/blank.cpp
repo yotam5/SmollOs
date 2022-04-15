@@ -16,7 +16,11 @@ int main(int argc, char** argv)
         print("\n");
     }*/
     //print("called ok\n");
+    
+    int r = smollos_fopen("hello.txt",1);
+    print("file opened\n");
     while(1){
+        
         //print("monke1 ");
         //smollos_getkeyblock();
         //print("monkeee\n");

@@ -12,6 +12,7 @@ global smollos_process_get_arguments:function
 global smollos_system:function
 global smollos_exit:function
 global user_putchar: function
+global smollos_fopen: function
 extern _fini
 
 ; void print(const char* filename)
@@ -122,5 +123,18 @@ user_putchar:
 
     int 0x80
     add esp,12
+    pop ebp
+    ret
+
+;int smollos_fopen(FILE* fil,const char* path,const int mode)
+smollos_fopen:
+    push ebp
+    mov ebp,esp
+    mov eax,11
+    push dword[ebp + 12]
+    push dword[ebp + 8]
+
+    int 0x80
+    add esp,8
     pop ebp
     ret

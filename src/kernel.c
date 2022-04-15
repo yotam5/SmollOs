@@ -263,16 +263,19 @@ void kernel_main()
     argument.next = 0x00; 
 
     process_inject_arguments(process, &argument);
-
-    res = process_load_switch("0:/shell.elf", &process);
-    if (res != SmollOs_ALL_OK)
+    
+    struct command_argument argument2;
+    struct process* process2 = 0;
+    int res2;
+    res2 = process_load_switch("0:/shell.elf", &process);
+    if (res2 != SmollOs_ALL_OK)
     {
         panic("Failed to load blank.elf\n");
     }
 
-    strcpy(argument.argument, "Abc!");
-    argument.next = 0x00; 
-    process_inject_arguments(process, &argument);
+    strcpy(argument2.argument, "Abc!");
+    argument2.next = 0x00; 
+    process_inject_arguments(process2, &argument2);
 
     task_run_first_ever_task();
 

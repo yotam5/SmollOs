@@ -18,4 +18,5 @@ void isr80h_register_commands()
     isr80h_register_command(SYSTEM_COMMAND8_GET_PROGRAM_ARGUMENTS, isr80h_command8_get_program_arguments);
     isr80h_register_command(SYSTEM_COMMAND9_EXIT, isr80h_command9_exit);
     isr80h_register_command(SYSTEM_COMMAND10_PUTCHAR, isr80h_command10_putchar);
+    isr80h_register_command(SYSTEM_COMMAND11_FOPEN, isr80h_command11_smollos_fopen);
 }

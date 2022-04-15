@@ -7,7 +7,7 @@
 #define SHELL_DEBUG 0
 Shell::Shell()
 :
-shell_version("SmollOs 1.0\n"),
+shell_version("SmollOs 1.0"),
 prompt(">"),
 line(1024),
 graphics(20,80),
@@ -30,9 +30,9 @@ Shell::~Shell()
     #endif
 }
 
-void Shell::displayPrompt(Colors color=Colors::VGA_GREEN) const
+void Shell::displayPrompt(Colors color=Colors::VGA_GREEN)
 {
-
+    this->graphics.putStringAt(this->current_x++,this->current_y,this->prompt,color);
 }
 
 
@@ -61,20 +61,18 @@ void Shell::shell_readline(String& str,bool show_while_typing=true)
         }
     }
     //print(str.c_str());
-    ++this->current_y;
 }
 
 void Shell::run()
 {    
     //print(this->shell_version.c_str());
+    this->displayPrompt();
     while(true)
     {
-        this->graphics.putStringAt(this->current_x++,this->current_y,this->prompt,Colors::VGA_GREEN);
         this->shell_readline(this->line);
         ++this->current_y;
         this->current_x = 0;
-        this->graphics.cls();
-        this->current_y = 0;
+        this->displayPrompt();
     }
 }
 

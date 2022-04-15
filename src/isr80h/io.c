@@ -2,6 +2,7 @@
 #include "../task/task.h"
 #include "../kernel.h"
 #include "../keyboard/keyboard.h"
+#include "../fs/fat/fatfs/ff.h"
 
 void* isr80h_command1_print(struct interrupt_frame* frame)
 {
@@ -35,4 +36,13 @@ void* isr80h_command10_putchar(struct interrupt_frame* frame)
     uint16_t* video_mem = (uint16_t*)0xB8000;
     video_mem[(y * 80) + x] = c;
     return 0;
+}
+
+extern FIL* fs_descriptors;
+void* isr80h_command11_smollos_fopen(struct interrupt_frame* frame)
+{
+    const char* path = (const char*)task_get_stack_item(task_current(), 0);
+    const int mode = (const int)(task_get_stack_item(task_current(), 1));
+    //mode need to be int 1,2,3..
+    return (void*)f_open(fs_descriptors[0], path,mode);
 }

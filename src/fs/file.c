@@ -9,9 +9,11 @@
 #include "../disk/disk.h"
 #include "../string/string.h"
 #include "../kernel.h"
+#include "./fat/fatfs/ff.h"
 
 struct filesystem* filesystems[SmollOs_MAX_FILESYSTEMS];
 struct file_descriptor* file_descriptors[SmollOs_MAX_FILE_DESCRIPTORS];
+FIL* fs_descriptors[10];
 
 static struct filesystem** fs_get_free_filesystem()
 {

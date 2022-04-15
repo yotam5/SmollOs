@@ -3,7 +3,6 @@
 #include "../stdlib/stdlib.h"
 #include "../stdlib/stdio.h"
 #include "../stdlib/string.h"
-extern struct storage_dev_t linux_dev;
 int main(int argc, char** argv)
 {
 

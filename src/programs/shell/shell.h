@@ -12,7 +12,7 @@ public:
     void run();
     String getShellVersion() const;
     String getPrompt() const;
-    void displayPrompt(Colors) const;
+    void displayPrompt(Colors);
     void shell_readline(String& str,bool show_while_typing);
     void cls();
 private:
