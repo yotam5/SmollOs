@@ -9,7 +9,8 @@
 #include "../memory/paging/paging.h"
 #include "../loader/formats/elf/elfloader.h"
 #include <stdbool.h>
-
+#include "../fs/fat/fatfs/ff.h"
+#include "../fs/fat/fatfs/diskio.h"
 
 // The current process that is running
 struct process* current_process = 0;
@@ -304,28 +305,28 @@ static int process_load_binary(const char* filename, struct process* process)
 {
     void* program_data_ptr = 0x00;
     int res = 0;
-    int fd = fopen(filename, "r");
+    int fd = fopen(filename, 1);
     if (!fd)
     {
         res = -EIO;
         goto out;
     }
 
-    struct file_stat stat;
-    res = fstat(fd, &stat);
+    FILINFO stat;
+    res = fstat(filename, &stat);
     if (res != SmollOs_ALL_OK)
     {
         goto out;
     }
 
-    program_data_ptr = kzalloc(stat.filesize);
+    program_data_ptr = kzalloc(stat.fsize);
     if (!program_data_ptr)
     {
         res = -ENOMEM;
         goto out;
     }
 
-    if (fread(program_data_ptr, stat.filesize, 1, fd) != 1)
+    if (fread(program_data_ptr, stat.fsize, 1, fd) != 1)
     {
         res = -EIO;
         goto out;
@@ -333,7 +334,7 @@ static int process_load_binary(const char* filename, struct process* process)
 
     process->filetype = PROCESS_FILETYPE_BINARY;
     process->ptr = program_data_ptr;
-    process->size = stat.filesize;
+    process->size = stat.fsize;
 
 out:
     if (res < 0)

@@ -58,7 +58,7 @@ void task_run_first_ever_task();
 void task_return(struct registers* regs);
 void restore_general_purpose_registers(struct registers* regs);
 void user_registers();
-
+int copy_string_to_task(struct task* task, void* virt, void* phys, int max);
 void task_current_save_state(struct interrupt_frame *frame);
 int copy_string_from_task(struct task* task, void* virt, void* phys, int max);
 void* task_get_stack_item(struct task* task, int index);

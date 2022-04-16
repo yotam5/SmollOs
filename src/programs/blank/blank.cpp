@@ -16,9 +16,13 @@ int main(int argc, char** argv)
         print("\n");
     }*/
     //print("called ok\n");
-    
+    print("blank called\n");
     int r = smollos_fopen("/hello.txt",1);
     print("file opened\n");
+    char buff[100];
+    int n = smollos_fread(buff,sizeof(buff),1,r);
+    print("file was read\n");
+    print(buff);
     while(1){
         
         //print("monke1 ");

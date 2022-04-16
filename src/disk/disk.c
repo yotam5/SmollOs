@@ -5,7 +5,6 @@
 #include "../status.h"
 #include "../string/string.h"
 #include "../kernel.h"
-struct disk disk;
 
 //reads from the disk
 int disk_read_sector(int lba, int total, void *buf){
@@ -63,40 +62,4 @@ int disk_write_sector(int lba, int total,const void *buf)
 	}
 	return 0;
 
-}
-
-void disk_search_and_init()
-{
-	memset(&disk, 0, sizeof(disk));
-	disk.type = SMOLLOS_DISK_TYPE_REAL;
-	disk.sector_size = SmollOs_SECTOR_SIZE;
-	disk.id = 0;
-	disk.filesystem = fs_resolve(&disk);
-}
-
-struct disk* disk_get(int index)
-{
-	if(index != 0){ //invalid disk
-		return 0;
-	}
-	return &disk;
-}
-
-int disk_read_block(struct disk* idisk, unsigned int lba, int total, void* buf)
-{
-	//print("read block\n");
-	if(idisk != &disk)
-	{
-			return -EIO;
-	}
-	return disk_read_sector(lba, total, buf);
-}
-
-int disk_write_block(struct disk* idisk, unsigned int lba, int total, void* buf)
-{
-	if(idisk != &disk)
-	{
-		return -EIO;
-	}
-	return disk_write_sector(lba,total,buf);
 }

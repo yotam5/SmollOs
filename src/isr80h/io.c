@@ -2,8 +2,9 @@
 #include "../task/task.h"
 #include "../kernel.h"
 #include "../keyboard/keyboard.h"
-#include "../fs/fat/fatfs/ff.h"
-
+#include "../fs/file.h"
+#include "../memory/memory.h"
+#include "../memory/heap/kheap.h"
 void* isr80h_command1_print(struct interrupt_frame* frame)
 {
     void* user_space_msg_buffer = task_get_stack_item(task_current(), 0);
@@ -38,7 +39,6 @@ void* isr80h_command10_putchar(struct interrupt_frame* frame)
     return 0;
 }
 
-extern FIL fss_descriptors[10];
 void* isr80h_command11_smollos_fopen(struct interrupt_frame* frame)
 {
     char buff[1024];
@@ -46,13 +46,21 @@ void* isr80h_command11_smollos_fopen(struct interrupt_frame* frame)
     const int mode = (const int)(int)(task_get_stack_item(task_current(), 1));
     copy_string_from_task(task_current(), path_ptr, buff, sizeof(buff));
     //mode need to be int 1,2,3..
-    print(buff);
-    
-    FRESULT res =  f_open(&fss_descriptors[0], buff,mode);
-    if(res){}
-    char buff2[100];
-    f_read(&fss_descriptors[0],buff2,10,NULL);
-    print(buff2);
-    return 0;
+    //print(buff);
+    int fd = fopen(buff, mode);
+    return (void*)fd;
+}
 
+//void* ptr, uint32_t size, uint32_t nmemb, int fd
+void* isr80h_command12_smollos_fread(struct interrupt_frame* frame)
+{
+    print("fread was called\n");
+    char* user_space_buffer = (char*)(int)task_get_stack_item(task_current(), 0);
+    uint32_t size = (uint32_t)(int)task_get_stack_item(task_current(), 1);
+    uint32_t nmemb = (uint32_t)(int)task_get_stack_item(task_current(), 2);
+    int fd = (int)task_get_stack_item(task_current(), 3);
+    char* tmp = (char*)kmalloc(size);
+    int res = fread(tmp,size,nmemb,fd);
+    copy_string_to_task(task_current(),user_space_buffer,tmp,size);
+    return (void*)res;
 }

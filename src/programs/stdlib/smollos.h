@@ -34,7 +34,8 @@ void smollos_process_get_arguments(struct process_arguments* arguments);
 void smollos_terminal_readline(char* out,int max, bool output_while_typing);
 struct command_argument* smollos_parse_command(const char* command, int max);
 void smollos_exit();
-int smollos_fopen( const char*,const int);
+int smollos_fopen(const char*,const int);
+int smollos_fread(void* ptr, uint32_t size, uint32_t nmemb, int fd);
 #ifdef __cplusplus
 // if this is a C++ compiler, we need to close off the extern declaration.
 };

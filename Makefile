@@ -6,17 +6,14 @@ FILES = ./build/kernel.asm.o \
 ./build/keyboard/classic.o \
 ./build/keyboard/keyboard.o \
 ./build/isr80h/io.o \
-./build/isr80h/misc.o \
 ./build/task/process.o\
 ./build/isr80h/isr80h.o \
 ./build/task/task.asm.o \
 ./build/task/tss.asm.o \
 ./build/task/task.o  \
 ./build/disk/disk.o \
-./build/disk/streamer.o \
 ./build/fs/pparser.o \
 ./build/fs/file.o \
-./build/fs/fat/fat16.o \
 ./build/string/string.o \
 ./build/idt/idt.asm.o ./build/idt/idt.o \
 ./build/memory/memory.o \
@@ -99,9 +96,6 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 ./build/isr80h/heap.o: ./src/isr80h/heap.c
 	i686-elf-gcc $(INCLUDES) -I./src/isr80h $(FLAGS) -std=gnu99 -c ./src/isr80h/heap.c -o ./build/isr80h/heap.o
 
-./build/isr80h/misc.o: ./src/isr80h/misc.c
-	i686-elf-gcc $(INCLUDES) -I./src/isr80h $(FLAGS) -std=gnu99 -c ./src/isr80h/misc.c -o ./build/isr80h/misc.o
-
 ./build/isr80h/io.o: ./src/isr80h/io.c
 	i686-elf-gcc $(INCLUDES) -I./src/isr80h $(FLAGS) -std=gnu99 -c ./src/isr80h/io.c -o ./build/isr80h/io.o
 
@@ -154,12 +148,6 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 
 ./build/disk/disk.o: ./src/disk/disk.c
 	i686-elf-gcc $(INCLUDES) -I./src/disk $(FLAGS) -std=gnu99 -c -Os ./src/disk/disk.c -o ./build/disk/disk.o
-
-./build/disk/streamer.o: ./src/disk/streamer.c
-	i686-elf-gcc $(INCLUDES) -I./src/disk $(FLAGS) -std=gnu99 -c -Os ./src/disk/streamer.c -o ./build/disk/streamer.o
-
-./build/fs/fat/fat16.o: ./src/fs/fat/fat16.c
-	i686-elf-gcc $(INCLUDES) -I./src/fs -I./src/fat $(FLAGS) -std=gnu99 -c -Os ./src/fs/fat/fat16.c -o ./build/fs/fat/fat16.o
 
 ./build/fs/fat/diskfs.o: ./src/fs/fat/fatfs/diskio.c
 	i686-elf-gcc $(INCLUDES) -I./src/fs -I./src/fat $(FLAGS) -s -Os -std=gnu99 -c ./src/fs/fat/fatfs/diskio.c -o ./build/fs/fat/diskfs.o

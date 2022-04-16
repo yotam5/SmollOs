@@ -181,9 +181,3 @@ void heap_free(struct heap* heap, void* ptr)
 {
     heap_mark_blocks_free(heap, heap_address_to_block(heap, ptr));
 }
-
-void* heap_realloc(struct heap* heap, void* ptr, size_t size)
-{
-    int starting_block = heap_address_to_block(heap,ptr);
-    
-}

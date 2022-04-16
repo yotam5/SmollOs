@@ -176,38 +176,41 @@ out:
 int elf_load(const char* filename, struct elf_file** file_out)
 {
     struct elf_file* elf_file = kzalloc(sizeof(struct elf_file));
-    int fd = 0;
-    int res = fopen(filename, "r");
-    if (res <= 0)
+    //int fd = 0;
+    //int res = fopen(filename, "r");
+    FATFS fs;
+    f_mount(&fs, "",0);
+    FIL f;
+    int res = f_open(&f,filename,FA_READ);
+    if (res < 0)
     {
         res = -EIO;
         goto out;
     }
-
-    fd = res;
-    struct file_stat stat;
-    res = fstat(fd, &stat);
+    //fd = res;
+    //struct file_stat stat;
+    //res = fstat(fd, &stat);
+    FILINFO stat;
+    f_stat(filename,&stat);
     if (res < 0)
     {
         goto out;
     }
-
-    elf_file->elf_memory = kzalloc(stat.filesize);
-    res = fread(elf_file->elf_memory, stat.filesize, 1, fd);
+    elf_file->elf_memory = kzalloc(stat.fsize);
+    //res = fread(elf_file->elf_memory, stat.filesize, 1, fd);
+    res = f_read(&f,elf_file->elf_memory,stat.fsize,NULL);
     if (res < 0)
     {
         goto out;
     }
-
     res = elf_process_loaded(elf_file);
     if(res < 0)
     {
         goto out;
     }
-
     *file_out = elf_file;
 out:
-    fclose(fd);
+    f_close(&f);
     return res;
 }
 

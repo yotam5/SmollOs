@@ -8,7 +8,6 @@
 #include "disk/disk.h"
 #include "./fs/pparser.h"
 #include <stdint.h>
-#include "./disk/streamer.h"
 #include "./string/string.h"
 #include "./gdt/gdt.h"
 #include "./config.h"
@@ -180,16 +179,14 @@ void kernel_main()
     fs_init();
 
     // Search and initialize the disks
-    disk_search_and_init();
     //print("lol\n");
     //initalize fatfs
-    f_mount(&fatfs, "", 0);
     
-    FIL fil;
+    /*FIL fil;
     f_open(&fil,"/hello.txt",FA_READ);
     char buff[100];
     f_read(&fil,&buff,10,NULL);
-    f_close(&fil);
+    f_close(&fil);*/
     /*FIL fil;
     f_open(&fil,"/new.txt",FA_CREATE_NEW);
     f_write(&fil, "hello new file", 12, NULL);
@@ -256,7 +253,7 @@ void kernel_main()
     //smollos_terminal_readline(buff,sizeof(buff),true);    
     //smollos_getkeyblock();
     struct process* process = 0;
-    int res = process_load_switch("0:/Shell.elf", &process);
+    /*int res = process_load_switch("/Shell.elf", &process);
     if (res != SmollOs_ALL_OK)
     {
         panic("Failed to load blank.elf\n");
@@ -268,11 +265,11 @@ void kernel_main()
     argument.next = 0x00; 
 
     process_inject_arguments(process, &argument);
-    
+    */
     struct command_argument argument2;
     struct process* process2 = 0;
     int res2;
-    res2 = process_load_switch("0:/blank.elf", &process);
+    res2 = process_load_switch("/blank.elf", &process);
     if (res2 != SmollOs_ALL_OK)
     {
         panic("Failed to load blank.elf\n");

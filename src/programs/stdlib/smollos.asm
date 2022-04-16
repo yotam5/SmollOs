@@ -13,6 +13,7 @@ global smollos_system:function
 global smollos_exit:function
 global user_putchar: function
 global smollos_fopen: function
+global smollos_fread: function
 extern _fini
 
 ; void print(const char* filename)
@@ -135,20 +136,22 @@ smollos_fopen:
     push dword[ebp + 8]
 
     int 0x80
-    add esp,12
+    add esp,8
     pop ebp
     ret
 
-;int fread(int fd,void* buf, int length)
+;smollos_fread(void* ptr, uint32_t size, uint32_t nmemb, int fd)
 smollos_fread:
     push ebp
     mov ebp,esp
+    mov eax,12
+    push dword[ebp+20]
     push dword[ebp+16]
     push dword[ebp+12]
     push dword[ebp+8]
 
     int 0x80
-    add esp,12
+    add esp,16
     pop ebp
     ret
 
