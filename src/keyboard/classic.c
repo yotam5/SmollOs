@@ -67,6 +67,7 @@ uint8_t classic_keyboard_scancode_to_char(uint8_t scancode)
 
 void classic_keyboard_handle_interrupt()
 {
+    //print("key pressed\n");
     kernel_page();
     uint8_t scancode = 0;
     scancode = insb(KEYBOARD_INPUT_PORT);

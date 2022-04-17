@@ -3,17 +3,20 @@
 section .asm
 
 global print:function
-global smollos_getkey:function
-global smollos_malloc:function
-global smollos_free:function
+global smollos_getkey: function
+global smollos_malloc: function
+global smollos_free: function
 global smollos_putchar:function
-global smollos_process_load_start:function
-global smollos_process_get_arguments:function 
+global smollos_process_load_start: function
+global smollos_process_get_arguments: function 
 global smollos_system:function
-global smollos_exit:function
+global smollos_exit: function
 global user_putchar: function
 global smollos_fopen: function
 global smollos_fread: function
+global smollos_fclose: function
+global smollos_mkdir: function
+global smollos_fwrite: function
 extern _fini
 
 ; void print(const char* filename)
@@ -139,7 +142,7 @@ smollos_fopen:
     add esp,8
     pop ebp
     ret
-
+    
 ;smollos_fread(void* ptr, uint32_t size, uint32_t nmemb, int fd)
 smollos_fread:
     push ebp
@@ -157,3 +160,36 @@ smollos_fread:
 
 ;void fclose(int fd)
 smollos_fclose:
+    push ebp
+    mov ebp,esp
+    mov eax,13
+    push dword[ebp+8]
+    int 0x80
+    add esp,4
+    pop ebp
+    ret
+
+;void  mkdir(char* path)
+smollos_mkdir:
+    push ebp
+    mov ebp,esp
+    mov eax,14
+    push dword[ebp+8]
+    int 0x80
+    add esp,4
+    pop ebp
+    ret
+
+;void smollos_fwrite(int fd,const char* buff,uint32_t amount,uint32_t* nmemb);
+smollos_fwrite:
+    push ebp
+    mov ebp,esp
+    mov eax,15
+    push dword[ebp+20]
+    push dword[ebp+16]
+    push dword[ebp+12]
+    push dword[ebp+8]
+    int 0x80
+    add esp,16
+    pop ebp
+    ret

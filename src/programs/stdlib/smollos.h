@@ -36,6 +36,8 @@ struct command_argument* smollos_parse_command(const char* command, int max);
 void smollos_exit();
 int smollos_fopen(const char*,const int);
 int smollos_fread(void* ptr, uint32_t size, uint32_t nmemb, int fd);
+int smollos_fclose(int fd);
+void smollos_fwrite(int fd,const char* buff,uint32_t amount,uint32_t* nmemb);
 #ifdef __cplusplus
 // if this is a C++ compiler, we need to close off the extern declaration.
 };

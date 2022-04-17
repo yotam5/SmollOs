@@ -63,8 +63,6 @@ void idt_handle_exception()
 void idt_clock()
 {
     outb(0x20, 0x20);
-    
-    // Switch to the next task
     task_next();
 }
 

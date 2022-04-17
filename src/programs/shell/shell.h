@@ -21,6 +21,7 @@ private:
   std::string shell_version;
   std::string prompt;
   std::string line;
+  std::string current_directory;
   vga::Graphics graphics;
   unsigned current_x;
   unsigned current_y;

@@ -91,8 +91,6 @@ void terminal_initialize()
     }   
 }
 
-
-
 void print(const char* str)
 {
     size_t len = strlen(str);
@@ -246,14 +244,13 @@ void kernel_main()
 
     // Register the kernel commands
     isr80h_register_commands();
-
     // Initialize all the system keyboards
     keyboard_init();    
     //char buff[1000];
     //smollos_terminal_readline(buff,sizeof(buff),true);    
     //smollos_getkeyblock();
     struct process* process = 0;
-    /*int res = process_load_switch("/Shell.elf", &process);
+    int res = process_load_switch("/blank.elf", &process);
     if (res != SmollOs_ALL_OK)
     {
         panic("Failed to load blank.elf\n");
@@ -261,24 +258,24 @@ void kernel_main()
 
 
     struct command_argument argument;
-    strcpy(argument.argument, "Testing!");
+    strcpy(argument.argument, "/hello.txt");
     argument.next = 0x00; 
 
     process_inject_arguments(process, &argument);
-    */
+    
     struct command_argument argument2;
     struct process* process2 = 0;
     int res2;
-    res2 = process_load_switch("/blank.elf", &process);
+    res2 = process_load_switch("/shell.elf", &process2);
     if (res2 != SmollOs_ALL_OK)
     {
         panic("Failed to load blank.elf\n");
     }
 
-    strcpy(argument2.argument, "Abc!");
+    strcpy(argument2.argument, "/hello.txt");
     argument2.next = 0x00; 
     process_inject_arguments(process2, &argument2);
-
+    
     task_run_first_ever_task();
 
     while(1) {}

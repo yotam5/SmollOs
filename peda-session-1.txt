@@ -1,5 +1,6 @@
-break io.c:55
-break io.c:65
-break io.c:64
-break blank.cpp:26
+break *0x400000
+break blank.cpp:27
+break shell.cpp:72
+break shell.cpp:60
+break shell.cpp:61
 

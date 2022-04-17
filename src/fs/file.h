@@ -4,10 +4,11 @@
 #include "./pparser.h"
 #include <stdint.h>
 
-int fopen(const char* filename, const int);
+int fopen(const char* filename, const int mode);
 int fseek(int fd, int offset, int whence);
-int fread(void* ptr, uint32_t size, uint32_t nmemb, int fd);
-int fwrite(const void* ptr, uint32_t size, uint32_t nmemb, int fd);
+int fread(void* ptr, uint32_t size, uint32_t* nmemb, int fd);
+int fwrite(const void* ptr, uint32_t size, uint32_t* nmemb, int fd);
+int fsmkdir(const void* ptr);
 int fstat(const char* path, void* stat);
 int fclose(int fd);
 void fs_init();

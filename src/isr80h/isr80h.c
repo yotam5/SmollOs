@@ -19,4 +19,8 @@ void isr80h_register_commands()
     isr80h_register_command(SYSTEM_COMMAND10_PUTCHAR, isr80h_command10_putchar);
     isr80h_register_command(SYSTEM_COMMAND11_FOPEN, isr80h_command11_smollos_fopen);
     isr80h_register_command(SYSTEM_COMMAND12_FREAD, isr80h_command12_smollos_fread);
+    isr80h_register_command(SYSTEM_COMMAND13_FCLOSE, isr80h_command13_smollos_fclose);
+    isr80h_register_command(SYSTEM_COMMAND14_MKDIR, isr80h_command14_smollos_mkdir);
+    isr80h_register_command(SYSTEM_COMMAND15_FWRITE, isr80h_command15_smollos_fwrite);
+
 }

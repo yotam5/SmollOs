@@ -326,7 +326,7 @@ static int process_load_binary(const char* filename, struct process* process)
         goto out;
     }
 
-    if (fread(program_data_ptr, stat.fsize, 1, fd) != 1)
+    if (fread(program_data_ptr, stat.fsize, NULL, fd) != 1)
     {
         res = -EIO;
         goto out;

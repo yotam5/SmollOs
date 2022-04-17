@@ -44,7 +44,7 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	sudo cp ./hello.txt /mnt/d
 	sudo cp ./src/programs/blank/blank.elf /mnt/d
 	sudo cp ./src/programs/shell/shell.elf /mnt/d
-
+	sudo cp ./src/programs/cat/cat.elf /mnt/d
 	sudo umount /mnt/d
 
 ./crtbegin.o: ./src/crti.asm
@@ -169,12 +169,13 @@ user_programs:
 	cd ./src/programs/std && $(MAKE) all
 	cd ./src/programs/blank && $(MAKE) all
 	cd ./src/programs/shell && $(MAKE) all
-
+	cd ./src/programs/cat && $(MAKE) all
 user_programs_clean:
 	cd ./src/programs/stdlib && $(MAKE) clean
 	cd ./src/programs/blank && $(MAKE) clean
 	cd ./src/programs/shell && $(MAKE) clean
 	cd ./src/programs/std && $(MAKE) clean
+	cd ./src/programs/cat && $(MAKE) clean
 
 clean: user_programs_clean
 	rm -rf ./bin/boot.bin

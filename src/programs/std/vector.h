@@ -21,6 +21,9 @@ namespace std
         T& operator[](size_t index) const;
         T& at(size_t index) const;
         size_t capacity() const;
+        void clear();
+        bool empty() const;
+        T& front() const;
     private:
         size_t capacity_,size_; 
         T* ptr = nullptr;

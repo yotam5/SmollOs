@@ -6,7 +6,6 @@ void c_start()
 {
   struct process_arguments arguments;
   smollos_process_get_arguments(&arguments);
-
   int res = main(arguments.argc, arguments.argv);
   if(res == 0)
   {

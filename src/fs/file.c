@@ -67,8 +67,19 @@ int fseek(int fd, int offset, int whence)
     return -1;
 }
 
-int fread(void* ptr, uint32_t size, uint32_t nmemb, int fd)
+int fwrite(const void* ptr, uint32_t size, uint32_t* nmemb, int fd)
+{
+    f_write(fss_descriptors[fd],ptr,size,(unsigned int*)nmemb);
+    return 0;
+}
+
+int fread(void* ptr, uint32_t size, uint32_t* nmemb, int fd)
 {
     f_read(fss_descriptors[fd],ptr,size,NULL);
+    return 0;
+}
+
+int fsmkdir(const void* ptr)
+{
     return 0;
 }

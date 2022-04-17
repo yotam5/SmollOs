@@ -7,7 +7,7 @@
 #define SHELL_DEBUG 0
 namespace shell {
 Shell::Shell()
-    : shell_version("SmollOs 1.0"), prompt(">"), line(1024), graphics(20, 80),
+    : shell_version("SmollOs 1.0"), prompt(">"), line(1024), current_directory(""), graphics(20, 80),
       current_x(0), current_y(0) {
   /*
   note: if not initialize in : then will be deleted unless using new
@@ -66,7 +66,6 @@ void Shell::run() {
 }
 } // namespace shell
 int main(int argc, char **argv) {
-
   std::string str = "0123456789";
 
   shell::Shell sh = shell::Shell();
