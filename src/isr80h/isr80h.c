@@ -22,5 +22,10 @@ void isr80h_register_commands()
     isr80h_register_command(SYSTEM_COMMAND13_FCLOSE, isr80h_command13_smollos_fclose);
     isr80h_register_command(SYSTEM_COMMAND14_MKDIR, isr80h_command14_smollos_mkdir);
     isr80h_register_command(SYSTEM_COMMAND15_FWRITE, isr80h_command15_smollos_fwrite);
+    isr80h_register_command(SYSTEM_COMMAND16_FSTAT, isr80h_command16_smollos_fstat);
+    isr80h_register_command(SYSTEM_COMMAND17_OPENDIR, isr80h_command17_smollos_opendir);
+    isr80h_register_command(SYSTEM_COMMAND18_CLOSEDIR, isr80h_command18_smollos_closedir);
+    isr80h_register_command(SYSTEM_COMMAND19_FREADDIR, isr80h_command19_smollos_freaddir);
+
 
 }

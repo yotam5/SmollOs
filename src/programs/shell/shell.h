@@ -16,7 +16,10 @@ public:
   void displayPrompt(Colors);
   void shell_readline(std::string &str, bool show_while_typing);
   void cls();
-
+  void parse_command(std::string& cmd,unsigned &);
+  int dir(const std::string& path);
+  void mkdir(const std::string& path);
+  unsigned int cmdhash(const char* cstr,int l,int b) const;
 private:
   std::string shell_version;
   std::string prompt;

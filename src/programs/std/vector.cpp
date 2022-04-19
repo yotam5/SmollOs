@@ -4,26 +4,26 @@
 namespace std
 {
     template <class T>
-    Vector<T>::Vector(size_t n) :
+    vector<T>::vector(size_t n) :
     capacity_(n),
     size_(n),
     ptr{static_cast<T*>(malloc(sizeof(T)*capacity_))}
     {}
 
     template <class T>
-    T* Vector<T>:: begin() const
+    T* vector<T>:: begin() const
     {
         return ptr;
     }
 
     template <class T>
-    T* Vector<T>:: end() const
+    T* vector<T>:: end() const
     {
         return ptr + size_;
     }
     
     template <class T>
-    void Vector<T>::push_back(T elem)
+    void vector<T>::push_back(T elem)
     {
         if(this->capacity_ > this->size_){
             this->ptr[this->size_++] = elem;
@@ -43,25 +43,25 @@ namespace std
     }
 
     template<class T>
-    bool Vector<T>::empty() const
+    bool vector<T>::empty() const
     {
         return this->size_ == 0;
     }
 
     template<class T>
-    T& Vector<T>::front() const
+    T& vector<T>::front() const
     {
         return this->ptr[0];
     }
 
     template <class T>
-    T Vector<T>::pop_back()
+    T vector<T>::pop_back()
     {
         ~this->ptr[this->size_];
         return this->ptr[this->size_--];
     }  
     template<class T>
-    void Vector<T>::clear()
+    void vector<T>::clear()
     {
         delete[] this->ptr;
         this->capacity_ = 0;
@@ -69,7 +69,7 @@ namespace std
     }
 
     template <class T>
-    Vector<T>::~Vector()
+    vector<T>::~vector()
     {
        delete[] this->ptr;
     }

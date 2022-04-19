@@ -140,6 +140,43 @@ void task_save_state(struct task *task, struct interrupt_frame *frame)
     task->registers.esi = frame->esi;
 }
 
+
+
+int memcpy_to_task(struct task* task,void* virt,void* phys,int max)
+{
+    if (max >= PAGING_PAGE_SIZE)
+    {
+        return -EINVARG;
+    }
+
+    int res = 0;
+    char* tmp = kzalloc(max);
+    if (!tmp)
+    {
+        res = -ENOMEM;
+        goto out;
+    }
+
+    uint32_t* task_directory = task->page_directory->directory_entry;
+    uint32_t old_entry = paging_get(task_directory, tmp);
+    memcpy(tmp, phys, max); 
+    paging_map(task->page_directory, tmp, tmp, PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    paging_switch(task->page_directory);
+    memcpy(virt, tmp, max);
+    kernel_page();
+    res = paging_set(task_directory, tmp, old_entry);
+    if (res < 0)
+    {
+        res = -EIO;
+        goto out_free;
+    }
+
+out_free:
+    kfree(tmp);
+out:
+    return res;
+}    
+
 int copy_string_to_task(struct task* task, void* virtual, void* phys, int max)
 {
     if (max >= PAGING_PAGE_SIZE)
@@ -176,7 +213,44 @@ out:
     return res;
 }
 
-int copy_string_from_task(struct task* task, void* virtual, void* phys, int max)
+int memcpy_from_task(struct task* task, const void* virtual, void* phys, int max)
+{
+    if (max >= PAGING_PAGE_SIZE)
+    {
+        return -EINVARG;
+    }
+
+    int res = 0;
+    char* tmp = kzalloc(max);
+    if (!tmp)
+    {
+        res = -ENOMEM;
+        goto out;
+    }
+
+    uint32_t* task_directory = task->page_directory->directory_entry;
+    uint32_t old_entry = paging_get(task_directory, tmp);
+    paging_map(task->page_directory, tmp, tmp, PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    paging_switch(task->page_directory);
+    memcpy(tmp, (void*)virtual, max);
+    kernel_page();
+
+    res = paging_set(task_directory, tmp, old_entry);
+    if (res < 0)
+    {
+        res = -EIO;
+        goto out_free;
+    }
+
+    memcpy(phys, tmp, max);
+
+out_free:
+    kfree(tmp);
+out:
+    return res;
+}
+
+int copy_string_from_task(struct task* task, const void* virtual, void* phys, int max)
 {
     if (max >= PAGING_PAGE_SIZE)
     {

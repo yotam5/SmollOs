@@ -5,11 +5,12 @@
 
 int main(int argc, char** argv)
 {
-    int fd = smollos_fopen(argv[0],1);
-    char buffer[1024];
-    smollos_fread(buffer, sizeof(buffer), 1, fd);
+    FILINFO fno;
+    smollos_fstat(argv[0],&fno);
+    char* buff = (char*)smollos_malloc(fno.fsize);
+    FIL* fd = smollos_fopen(argv[0], 1);
+    smollos_fread(buff,sizeof(buff),1,fd);
     smollos_fclose(fd);
-    print(buffer);
-    print("\n");
+    print(buff);
     return 0;
 }

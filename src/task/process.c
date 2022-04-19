@@ -3,7 +3,7 @@
 #include "../memory/memory.h"
 #include "../status.h"
 #include "../memory/heap/kheap.h"
-#include "../fs/file.h"
+#include "../fs/fs.h"
 #include "../string/string.h"
 #include "../kernel.h"
 #include "../memory/paging/paging.h"
@@ -305,7 +305,7 @@ static int process_load_binary(const char* filename, struct process* process)
 {
     void* program_data_ptr = 0x00;
     int res = 0;
-    int fd = fopen(filename, 1);
+    FIL* fd = fopen(filename, 1);
     if (!fd)
     {
         res = -EIO;

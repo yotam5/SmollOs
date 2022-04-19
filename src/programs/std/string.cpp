@@ -8,19 +8,26 @@ string::string(const int initial) {
   if (initial >= 0) {
     this->length = 0;
     this->data = new char[initial];
-    this->available = initial;
+    this->capacity = initial;
   } else {
     print("NEGATIVE VALUE\n");
     this->length = 0;
     this->data = new char[0];
-    this->available = 0;
+    this->capacity = 0;
   }
+}
+
+void string::clear()
+{
+  memset(this->data,0,this->capacity+this->length);
+  this->length = 0;
+  this->capacity += this->length;
 }
 
 string::string(const unsigned initial) {
   this->length = 0;
   data = new char[this->length];
-  this->available = initial;
+  this->capacity = initial;
 }
 
 string::string() {
@@ -29,7 +36,7 @@ string::string() {
 #endif
   this->length = 0;
   data = new char[0];
-  this->available = 0;
+  this->capacity = 0;
 }
 
 string::string(char c) {
@@ -38,7 +45,7 @@ string::string(char c) {
 #endif
   this->length = 1;
   data = new char(c);
-  this->available = 0;
+  this->capacity = 0;
 }
 
 string::string(const char *c) {
@@ -55,11 +62,11 @@ string::string(const char *c) {
     for (unsigned i = 0; i < this->length; i++) {
       this->data[i] = c[i];
     }
-    this->available = 0;
+    this->capacity = 0;
   } else {
     this->length = 0;
     this->data = 0;
-    this->available = 0;
+    this->capacity = 0;
   }
 }
 
@@ -77,12 +84,12 @@ string::string(char *c) {
     for (unsigned i = 0; i < this->length; i++) {
       this->data[i] = c[i];
     }
-    this->available = 0;
+    this->capacity = 0;
   } else {
     this->length = 0;
     this->data = 0;
   }
-  this->available = 0;
+  this->capacity = 0;
 }
 
 string::string(const string &s) {
@@ -94,7 +101,7 @@ string::string(const string &s) {
   for (unsigned i = 0; i < this->length; i++) {
     this->data[i] = s[i];
   }
-  this->available = s.available;
+  this->capacity = s.capacity;
 }
 
 string::string(string &s) {
@@ -106,7 +113,7 @@ string::string(string &s) {
   for (unsigned i = 0; i < this->length; i++) {
     this->data[i] = s[i];
   }
-  this->available = s.available;
+  this->capacity = s.capacity;
 }
 
 string::~string() {
@@ -118,7 +125,7 @@ string::~string() {
 
 unsigned string::len() const { return this->length; }
 
-unsigned string::getAvailable() const { return this->available; }
+unsigned string::getAvailable() const { return this->capacity; }
 
 int string::index(char c) const {
   for (unsigned i = 0; i < this->length; i++) {
@@ -170,8 +177,8 @@ char &string::operator[](unsigned i) {
 }
 
 string &string::operator+=(const char c) {
-  if (this->available > 0) {
-    --this->available;
+  if (this->capacity > 0) {
+    --this->capacity;
     this->data[this->length++] = c;
   }
   return *this;
@@ -189,6 +196,18 @@ string &string::operator+=(const string &s) {
   this->data = combined;
   this->length = this->length + s.length;
   return *this;
+}
+
+unsigned int string::find(char c) const
+{
+  int i = 0;
+  for(;i < this->length;i++)
+  {
+    if(this->data[i] == c){
+      return i;
+    }
+  }
+  return -1;
 }
 
 string operator+(const string &lhs, char rhs) {
@@ -245,34 +264,38 @@ bool operator!=(char lhs, const string &rhs) { return !(lhs == rhs); }
 bool operator!=(const char *lhs, const string &rhs) { return !(lhs == rhs); }
 
 void string::erase(unsigned pos, unsigned count) {
+  //NOTE: ERRROR PRONE NEED TO FIX
 #if string_DEBUG
   print("erase called\n");
 #endif
-  if (pos + count >= this->length) {
+  if (pos + count > this->length) {
+    return;
+  }
+  //1234567
+  if(pos + count == this->length - 1)
+  {
+    for(int i  = pos;i < pos+count;i++){
+      this->data[i] = '\0';
+    }
+    this->capacity += count;
+    this->length -= count;
     return;
   }
   int offset = pos + count;
-  for (unsigned i = pos; i < count; i++) {
+  for (unsigned i = pos; i < this->length-count; i++) {
     this->data[i] = this->data[offset];
-    this->data[offset] = ' ';
+    this->data[offset] = '\0';
     ++offset;
   }
-  char *resPtr = new char(this->length - count);
+  for(unsigned i  = this->length - count;i < this->length;i++)
+  {
+    this->data[i] = '\0';
+  }
+  this->capacity += count;
   this->length -= count;
-  memcpy((void *)resPtr, this->data, this->length);
-  delete[] this->data;
-#if string_DEBUG
-  print("data was deleted\n");
-#endif
-  this->data = resPtr;
 }
 
 char *string::c_str() const {
-  char *ptr = new char[this->length + 1];
-  for (unsigned i = 0; i < this->length; i++) {
-    ptr[i] = this->data[i];
-  }
-  ptr[this->length] = '\0';
-  return ptr;
+  return this->data;
 }
 } // namespace std

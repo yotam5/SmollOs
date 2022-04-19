@@ -8,7 +8,7 @@ CPPFLAGS += -Wno-write-strings -Wno-unused-variable -Wno-unused-parameter
 CPPFLAGS += -DKERNEL -fno-leading-underscore -nostartfiles -fpic -g
 
 all: ${FILES}
-	i686-elf-gcc -T ./linker.ld -o ./blank.elf ${CPPFLAGS} ${FILES} ../stdlib/stdlib.elf
+	i686-elf-gcc -T ./linker.ld -o ./blank.elf ${CPPFLAGS} ${FILES} ../stdlib/stdlib.elf 
 
 ./blank.o: ./blank.cpp
 	i686-elf-gcc ${INCLUDES}  -I./$(CPPFLAGS) -c ./blank.cpp -o ./blank.o

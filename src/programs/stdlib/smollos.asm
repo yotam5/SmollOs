@@ -17,6 +17,11 @@ global smollos_fread: function
 global smollos_fclose: function
 global smollos_mkdir: function
 global smollos_fwrite: function
+global smollos_fstat: function
+global smollos_opendir: function
+global smollos_closedir: function
+global smollos_freaddir: function
+
 extern _fini
 
 ; void print(const char* filename)
@@ -169,7 +174,7 @@ smollos_fclose:
     pop ebp
     ret
 
-;void  mkdir(char* path)
+;void  mkdir(const char* path)
 smollos_mkdir:
     push ebp
     mov ebp,esp
@@ -191,5 +196,52 @@ smollos_fwrite:
     push dword[ebp+8]
     int 0x80
     add esp,16
+    pop ebp
+    ret
+
+;void smollos_fstat(const char* path,FILINFO* info);
+smollos_fstat:
+    push ebp
+    mov ebp,esp
+    mov eax,16
+    push dword[ebp + 12]
+    push dword[ebp+8]
+    int 0x80
+    add esp,8
+    pop ebp
+    ret
+
+;void smollos_opendir(char* path)
+smollos_opendir:
+    push ebp
+    mov ebp,esp
+    mov eax,17
+    push dword[ebp + 12]
+    push dword[ebp+8]
+    int 0x80
+    add esp,8
+    pop ebp
+    ret
+
+;void smollos_closedir(DIR* dir)
+smollos_closedir:
+    push ebp
+    mov ebp,esp
+    mov eax,18
+    push dword[ebp + 8]
+    int 0x80
+    add esp,4
+    pop ebp
+    ret
+
+;FRESULT f_readdir (DIR* dp, FILINFO* fno);
+smollos_freaddir:
+    push ebp
+    mov ebp,esp
+    mov eax,19
+    push dword[ebp+12]
+    push dword[ebp+8]
+    int 0x80
+    add esp,8
     pop ebp
     ret

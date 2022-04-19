@@ -27,6 +27,15 @@ void Graphics::putStringAt(int x, int y, const std::string &s, Colors color) {
   }
 }
 
+int Graphics::putStringAt(int x,int y, const char* buff,Colors color)
+{
+  for(unsigned i = 0; buff[i] != '\0';i++){
+    this->putCharAt(x, y, buff[i],color);
+    ++x;
+  }
+  return x;
+}
+
 void Graphics::cls() {
   for (unsigned x = 0; x < this->width; x++) {
     for (unsigned y = 0; y < this->height; y++) {

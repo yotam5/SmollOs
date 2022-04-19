@@ -9,7 +9,7 @@ class string {
 private:
   char *data;
   unsigned int length;
-  unsigned int available;
+  unsigned int capacity;
 
 public:
   string();
@@ -21,9 +21,10 @@ public:
   string(const int);
   ~string();
   explicit string(char c);
-
+  void clear();
   unsigned len() const;
   unsigned getAvailable() const;
+  unsigned int  find(char c) const;
   int index(char c) const;
   void upcase(unsigned start, unsigned end);
   void downcase(unsigned start, unsigned end);

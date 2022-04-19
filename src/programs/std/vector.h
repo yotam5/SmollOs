@@ -4,14 +4,14 @@
 namespace std
 {
     template<class T>
-    class Vector
+    class vector
     {
     public:
-        Vector(const Vector<T>&other) = delete;
-        Vector<T>  operator = (const Vector<T>& other) = delete;
-        Vector(size_t n);
-        Vector();
-        ~Vector();
+        vector(const vector<T>&other) = delete;
+        vector<T>  operator = (const vector<T>& other) = delete;
+        vector(size_t n);
+        vector();
+        ~vector();
         T* begin() const;
         T* end() const;
         const T* cbegin() const;

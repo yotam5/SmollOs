@@ -14,6 +14,7 @@ public:
   ~Graphics();
   uint16_t make_char(char c, Colors color) const;
   void putStringAt(int x, int y, const std::string &, Colors);
+  int putStringAt(int x,int y, const char* buff,Colors);
   // void move_cursor(unsigned short pos);
   // void set_cursor(unsigned x, unsigned y);
   unsigned getWidth() const;

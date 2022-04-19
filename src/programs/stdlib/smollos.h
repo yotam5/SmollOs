@@ -7,6 +7,10 @@
 extern "C" {
 #endif
 
+#ifndef FF_DEFINED
+#include "../../fs/interfs.h"
+#endif
+
 #ifndef PROCESS_H
 struct command_argument
 {
@@ -34,10 +38,17 @@ void smollos_process_get_arguments(struct process_arguments* arguments);
 void smollos_terminal_readline(char* out,int max, bool output_while_typing);
 struct command_argument* smollos_parse_command(const char* command, int max);
 void smollos_exit();
-int smollos_fopen(const char*,const int);
-int smollos_fread(void* ptr, uint32_t size, uint32_t nmemb, int fd);
-int smollos_fclose(int fd);
-void smollos_fwrite(int fd,const char* buff,uint32_t amount,uint32_t* nmemb);
+FIL* smollos_fopen(const char*,const int);
+int smollos_fread(void* ptr, uint32_t size, uint32_t nmemb, FIL* fd);
+int smollos_fclose(FIL* fd);
+void smollos_fwrite(FIL* fd,const char* buff,uint32_t amount,uint32_t* nmemb);
+void  smollos_mkdir(const char* path);
+int smollos_fstat(const char* path,FILINFO* info);
+int smollos_fclosedir(DIR* dir);
+DIR* smollos_opendir(const char* path);
+int smollos_closedir(DIR* dir);
+int smollos_freaddir(DIR* dir,FILINFO*  fno);
+int smollos_getcwd (char* buff, unsigned int len);
 #ifdef __cplusplus
 // if this is a C++ compiler, we need to close off the extern declaration.
 };
