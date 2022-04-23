@@ -15,4 +15,5 @@ void* isr80h_command16_smollos_fstat(struct interrupt_frame* frame);
 void* isr80h_command17_smollos_opendir(struct interrupt_frame* frame);
 void* isr80h_command18_smollos_closedir(struct interrupt_frame* frame);
 void* isr80h_command19_smollos_freaddir(struct interrupt_frame* frame);
+void* isr80h_command20_smollos_funlink(struct interrupt_frame* frame);
 #endif

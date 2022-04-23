@@ -5,7 +5,7 @@ namespace std
 {
     template<class T>
     class vector
-    {
+    {   
     public:
         vector(const vector<T>&other) = delete;
         vector<T>  operator = (const vector<T>& other) = delete;

@@ -32,7 +32,7 @@ struct process
 {
     // The process id
     uint16_t id;
-
+    uint16_t pid;
     char filename[SmollOs_MAX_PATH];
 
     // The main process task

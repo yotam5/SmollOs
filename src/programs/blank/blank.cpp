@@ -19,6 +19,7 @@ int main(int argc, char** argv)
     smollos_fclose(f);
     print(buff);
     smollos_mkdir("/test");
+    //smollos_funlink("/test");
     DIR*d = smollos_opendir("/");
     FILINFO fno2;
     smollos_freaddir(d,&fno2);

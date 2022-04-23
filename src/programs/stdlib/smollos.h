@@ -48,7 +48,8 @@ int smollos_fclosedir(DIR* dir);
 DIR* smollos_opendir(const char* path);
 int smollos_closedir(DIR* dir);
 int smollos_freaddir(DIR* dir,FILINFO*  fno);
-int smollos_getcwd (char* buff, unsigned int len);
+int smollos_funlink (const char* path);
+int smollos_frename (const TCHAR* path_old, const TCHAR* path_new);
 #ifdef __cplusplus
 // if this is a C++ compiler, we need to close off the extern declaration.
 };

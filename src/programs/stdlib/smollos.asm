@@ -21,7 +21,8 @@ global smollos_fstat: function
 global smollos_opendir: function
 global smollos_closedir: function
 global smollos_freaddir: function
-
+global smollos_funlink: function
+global smollos_frename: function
 extern _fini
 
 ; void print(const char* filename)
@@ -241,6 +242,29 @@ smollos_freaddir:
     mov eax,19
     push dword[ebp+12]
     push dword[ebp+8]
+    int 0x80
+    add esp,8
+    pop ebp
+    ret
+
+;FRESULT f_unlink (const char* path);
+smollos_funlink:
+    push ebp
+    mov ebp,esp
+    mov eax,20
+    push dword[ebp+8]
+    int 0x80
+    add esp,4
+    pop ebp
+    ret
+
+;int frename (const TCHAR* path_old, const TCHAR* path_new);
+smollos_frename:
+    push ebp
+    mov ebp,esp
+    push dword[ebp+12]
+    push dword[ebp+8]
+    mov eax,21
     int 0x80
     add esp,8
     pop ebp

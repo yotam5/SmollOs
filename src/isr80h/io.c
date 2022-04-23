@@ -135,3 +135,12 @@ void* isr80h_command19_smollos_freaddir(struct interrupt_frame* frame)
     memcpy_to_task(task_current(),fno_user_space,&tmp,sizeof(FILINFO));
     return 0;
 }
+
+void* isr80h_command20_smollos_funlink(struct interrupt_frame* frame)
+{
+    const char* path = (const char*)(int)task_get_stack_item(task_current(), 0);
+    char tmp[1024];
+    copy_string_from_task(task_current(), path, tmp,sizeof(tmp));
+    f_unlink(tmp);
+    return 0;
+}

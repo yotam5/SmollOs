@@ -76,7 +76,7 @@ void keyboard_push(char c)
 
     int real_index = keyboard_get_tail_index(process);
     process->keyboard.buffer[real_index] = c;
-    process->keyboard.tail++;
+    ++process->keyboard.tail;
 }
 
 char keyboard_pop()

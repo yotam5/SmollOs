@@ -20,6 +20,8 @@ public:
   int dir(const std::string& path);
   void mkdir(const std::string& path);
   unsigned int cmdhash(const char* cstr,int l,int b) const;
+  void del(const std::string& path);
+  void cd(const std::string& path);
 private:
   std::string shell_version;
   std::string prompt;

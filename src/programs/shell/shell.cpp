@@ -111,6 +111,15 @@ void Shell::mkdir(const std::string &path)
   smollos_mkdir(c.c_str());
 }
 
+void Shell::del(const std::string& path)
+{
+  std::string c = path;
+  int space = path.find(' ');
+  c.erase(0,space+1);
+  smollos_funlink(c.c_str());
+}
+
+
 void Shell::parse_command(std::string& cmd,unsigned& y)
 { 
 
@@ -128,9 +137,14 @@ void Shell::parse_command(std::string& cmd,unsigned& y)
     case 56:
         this->mkdir(this->line);
         break;
+    case 38:
+      this->del(this->line);
+      break;
     case 8:
       this->cls();
       //print("ERROR, no such command");
+      break;
+    default:
       break;
   }
 }
