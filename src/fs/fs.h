@@ -3,6 +3,9 @@
 #include "stdint.h"
 #include <stdint.h>
 #include "../fs/fat/fatfs/ff.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 FIL* fopen(const char* filename, const int mode);
 //int fseek(int fd, int offset, int whence);
@@ -15,4 +18,7 @@ int freaddir(DIR* dir, FILINFO* info);
 int closedir(DIR* dir);
 int fclose(FIL* fd);
 void fs_init();
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -1,6 +1,8 @@
 #ifndef ISR80H_H
 #define ISR80H_H
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 enum SystemCommands
 {
     SYSTEM_COMMAND0_SUM,
@@ -29,5 +31,7 @@ enum SystemCommands
 };
 
 void isr80h_register_commands();
-
+#ifdef __cplusplus
+}
+#endif
 #endif

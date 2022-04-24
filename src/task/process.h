@@ -8,6 +8,10 @@
 #define PROCESS_FILETYPE_ELF 0
 #define PROCESS_FILETYPE_BINARY 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef unsigned char PROCESS_FILETYPE;
 
 struct process_allocation
@@ -80,5 +84,8 @@ int process_get_free_slot();
 void process_get_arguments(struct process* process, int* argc, char*** argv);
 int process_inject_arguments(struct process* process, struct command_argument* root_argument);
 int process_terminate(struct process* process);
+#ifdef __cplusplus
+}
+#endif
 
 #endif

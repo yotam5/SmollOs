@@ -59,19 +59,20 @@ static int process_find_free_allocation_index(struct process* process)
 
 void* process_malloc(struct process* process, size_t size)
 {
+    int index,res;
     void* ptr = kzalloc(size);
     if (!ptr)
     {
         goto out_err;
     }
 
-    int index = process_find_free_allocation_index(process);
+    index = process_find_free_allocation_index(process);
     if (index < 0)
     {
         goto out_err;
     }
 
-    int res = paging_map_to(process->task->page_directory, ptr, ptr, paging_align_address(ptr+size), PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    res = paging_map_to(process->task->page_directory, ptr, ptr, paging_align_address(ptr+size), PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
     if (res < 0)
     {
         goto out_err;
@@ -241,13 +242,15 @@ int process_inject_arguments(struct process* process, struct command_argument* r
     struct command_argument* current = root_argument;
     int i = 0;
     int argc = process_count_command_arguments(root_argument);
+    char* argument_str;
+     char **argv;
     if (argc == 0)
     {
         res = -EIO;
         goto out;
     }
 
-    char **argv = process_malloc(process, sizeof(const char*) * argc);
+    argv = (char**)process_malloc(process, sizeof(const char*) * argc);
     if (!argv)
     {
         res = -ENOMEM;
@@ -257,7 +260,7 @@ int process_inject_arguments(struct process* process, struct command_argument* r
 
     while(current)
     {
-        char* argument_str = process_malloc(process, sizeof(current->argument));
+        argument_str = (char*)process_malloc(process, sizeof(current->argument));
         if (!argument_str)
         {
             res = -ENOMEM;
@@ -267,7 +270,7 @@ int process_inject_arguments(struct process* process, struct command_argument* r
         strncpy(argument_str, current->argument, sizeof(current->argument));
         argv[i] = argument_str;
         current = current->next;
-        i++;
+        ++i;
     }
 
     process->arguments.argc = argc;
@@ -483,7 +486,7 @@ int process_load_for_slot(const char* filename, struct process** process, int pr
         goto out;
     }
 
-    _process = kzalloc(sizeof(struct process));
+    _process = (struct process*)kzalloc(sizeof(struct process));
     if (!_process)
     {
         res = -ENOMEM;
@@ -510,7 +513,7 @@ int process_load_for_slot(const char* filename, struct process** process, int pr
 
     // Create a task
     task = task_new(_process);
-    if (ERROR_I(task) == 0)
+    if (task == 0)
     {
         res = ERROR_I(task);
         goto out;

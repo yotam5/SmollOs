@@ -2,6 +2,9 @@
 #define TASKSWITCHSEGMENT_H
 
 #include <stdint.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 struct tss
 {
     uint32_t link;
@@ -32,4 +35,7 @@ struct tss
 } __attribute__((packed));
 
 void tss_load(int tss_segment);
+#ifdef __cplusplus
+}
+#endif
 #endif

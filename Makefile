@@ -31,13 +31,19 @@ FILES = ./build/kernel.asm.o \
 
 INCLUDES = -I./src
 FLAGS = -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Werror -Wno-unused-label -Wno-cpp -Wno-unused-parameter -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -Iinc
+CFLAGS= -O2 -g -std=gnu++11 -nostdinc++ -fno-rtti
+CPPFLAGS  = -O2 -g -std=gnu++11 -nostdinc++ -fno-rtti
+CPPFLAGS += -finline-functions -ffreestanding -nostdlib
+CPPFLAGS += -Wall -Wextra -fno-exceptions -Warray-bounds
+CPPFLAGS += -Wno-write-strings -Wno-unused-variable -Wno-unused-parameter
+CPPFLAGS += -DKERNEL -fno-leading-underscore -nostartfiles -fpic -g -fno-pie
 
 all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	rm -rf ./bin/os.bin
 	dd if=./bin/boot.bin >> ./bin/os.bin
 	#//dd if=./bin/stagetwo.bin >> ./bin/os.bin
 	dd if=./bin/kernel.bin >> ./bin/os.bin
-	dd if=/dev/zero bs=1048576 count=18 >> ./bin/os.bin
+	dd if=/dev/zero bs=1048576 count=25 >> ./bin/os.bin
 	sudo mount -t vfat ./bin/os.bin /mnt/d
 	# Copy a file over
 	sudo cp ./hello.txt /mnt/d
@@ -59,8 +65,8 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	nasm -f elf ./src/programs/stdlib/smollos.asm -o ./smollos.asm.o
 
 ./bin/kernel.bin: $(FILES)
-	i686-elf-ld -g -relocatable $(FILES) -o ./build/kernelfull.o
-	i686-elf-gcc $(FLAGS) -T ./src/linker.ld -o ./bin/kernel.bin -ffreestanding -O0 -nostdlib ./build/kernelfull.o
+	i686-elf-gcc -g -r $(FILES) -o ./build/kernelfull.o
+	i686-elf-gcc $(CPPFLAGS) -T ./src/linker.ld -o ./bin/kernel.bin -ffreestanding -O0 -nostdlib ./build/kernelfull.o
 
 ./bin/boot.bin: ./src/boot/boot.asm
 	nasm -f bin ./src/boot/boot.asm -o ./bin/boot.bin
@@ -71,8 +77,8 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 ./build/kernel.asm.o: ./src/kernel.asm
 	nasm -f elf -g ./src/kernel.asm -o ./build/kernel.asm.o
 
-./build/kernel.o: ./src/kernel.c
-	i686-elf-gcc $(INCLUDES) $(FLAGS) -std=gnu99 -c ./src/kernel.c -o ./build/kernel.o
+./build/kernel.o: ./src/kernel.cpp
+	i686-elf-gcc $(INCLUDES) $(CPPFLAGS) -std=gnu++11 -c ./src/kernel.cpp -o ./build/kernel.o
 
 ./build/idt/idt.asm.o: ./src/idt/idt.asm
 	nasm -f elf -g ./src/idt/idt.asm -o ./build/idt/idt.asm.o
@@ -89,8 +95,8 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 ./build/gdt/gdt.asm.o: ./src/gdt/gdt.asm
 	nasm -f elf -g ./src/gdt/gdt.asm -o ./build/gdt/gdt.asm.o
 
-./build/isr80h/isr80h.o: ./src/isr80h/isr80h.c
-	i686-elf-gcc $(INCLUDES) -I./src/isr80h $(FLAGS) -std=gnu99 -c ./src/isr80h/isr80h.c -o ./build/isr80h/isr80h.o
+./build/isr80h/isr80h.o: ./src/isr80h/isr80h.cpp
+	i686-elf-gcc $(INCLUDES) -I./src/isr80h $(CPPFLAGS) -std=gnu++11 -c ./src/isr80h/isr80h.cpp -o ./build/isr80h/isr80h.o
 
 ./build/isr80h/heap.o: ./src/isr80h/heap.c
 	i686-elf-gcc $(INCLUDES) -I./src/isr80h $(FLAGS) -std=gnu99 -c ./src/isr80h/heap.c -o ./build/isr80h/heap.o
@@ -98,8 +104,8 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 ./build/isr80h/io.o: ./src/isr80h/io.c
 	i686-elf-gcc $(INCLUDES) -I./src/isr80h $(FLAGS) -std=gnu99 -c ./src/isr80h/io.c -o ./build/isr80h/io.o
 
-./build/isr80h/process.o: ./src/isr80h/process.c
-	i686-elf-gcc $(INCLUDES) -I./src/isr80h $(FLAGS) -std=gnu99 -c ./src/isr80h/process.c -o ./build/isr80h/process.o
+./build/isr80h/process.o: ./src/isr80h/process.cpp
+	i686-elf-gcc $(INCLUDES) -I./src/isr80h $(CPPFLAGS) -std=gnu++11 -c ./src/isr80h/process.cpp -o ./build/isr80h/process.o
 
 
 ./build/keyboard/keyboard.o: ./src/keyboard/keyboard.c
@@ -117,8 +123,8 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	i686-elf-gcc $(INCLUDES) -I./src/memory $(FLAGS) -std=gnu99 -c ./src/memory/memory.c -o ./build/memory/memory.o
 
 
-./build/task/process.o: ./src/task/process.c
-	i686-elf-gcc $(INCLUDES) -I./src/task $(FLAGS) -std=gnu99 -c  ./src/task/process.c -o ./build/task/process.o
+./build/task/process.o: ./src/task/process.cpp
+	i686-elf-gcc $(INCLUDES) -I./src/task $(CPPFLAGS) -std=gnu++11 -c  ./src/task/process.cpp -o ./build/task/process.o
 
 
 ./build/task/task.o: ./src/task/task.c
@@ -166,6 +172,7 @@ user_programs:
 	cd ./src/programs/blank && $(MAKE) all
 	cd ./src/programs/shell && $(MAKE) all
 	cd ./src/programs/cat && $(MAKE) all
+
 user_programs_clean:
 	cd ./src/programs/stdlib && $(MAKE) clean
 	cd ./src/programs/blank && $(MAKE) clean

@@ -10,17 +10,18 @@ void* isr80h_command6_process_load_start(struct interrupt_frame* frame)
 {
     void* filename_user_ptr = task_get_stack_item(task_current(), 0);
     char filename[SmollOs_MAX_PATH];
+    char path[SmollOs_MAX_PATH];
+    struct process* process;
     int res = copy_string_from_task(task_current(), filename_user_ptr, filename, sizeof(filename));
     if (res < 0)
     {
         goto out;
     }
 
-    char path[SmollOs_MAX_PATH];
     strcpy(path, "0:/");
     strcpy(path+3, filename);
 
-    struct process* process = 0;
+    process = 0;
     res = process_load_switch(path, &process);
     if (res < 0)
     {
@@ -36,7 +37,7 @@ out:
 
 void* isr80h_command7_invoke_system_command(struct interrupt_frame* frame)
 {
-    struct command_argument* arguments = task_virtual_address_to_physical(task_current(), task_get_stack_item(task_current(), 0));
+    struct command_argument* arguments = (command_argument*)task_virtual_address_to_physical(task_current(), task_get_stack_item(task_current(), 0));
     if (!arguments || strlen(arguments[0].argument) == 0)
     {
         return (void*)(-EINVARG);
@@ -71,7 +72,7 @@ void* isr80h_command7_invoke_system_command(struct interrupt_frame* frame)
 void* isr80h_command8_get_program_arguments(struct interrupt_frame* frame)
 {
     struct process* process = task_current()->process;
-    struct process_arguments* arguments = task_virtual_address_to_physical(task_current(), task_get_stack_item(task_current(), 0));
+    struct process_arguments* arguments = (process_arguments*)task_virtual_address_to_physical(task_current(), task_get_stack_item(task_current(), 0));
 
     process_get_arguments(process, &arguments->argc, &arguments->argv);
     return 0;
