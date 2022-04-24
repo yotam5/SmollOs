@@ -31,8 +31,8 @@ struct process_arguments
 struct process
 {
     // The process id
-    uint16_t id;
     uint16_t pid;
+    uint16_t ppid;
     char filename[SmollOs_MAX_PATH];
 
     // The main process task

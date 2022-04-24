@@ -27,5 +27,4 @@ void isr80h_register_commands()
     isr80h_register_command(SYSTEM_COMMAND18_CLOSEDIR, isr80h_command18_smollos_closedir);
     isr80h_register_command(SYSTEM_COMMAND19_FREADDIR, isr80h_command19_smollos_freaddir);
     isr80h_register_command(SYSTEM_COMMAND20_FUNLINK,isr80h_command20_smollos_funlink);
-
 }

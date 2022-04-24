@@ -84,3 +84,12 @@ void* isr80h_command9_exit(struct interrupt_frame* frame)
     task_next();
     return 0;
 }
+
+void* isr80h_command23_spawnp(struct interrupt_frame* frame)
+{
+    char path[SmollOs_MAX_PATH];
+
+    
+
+    return 0;
+}

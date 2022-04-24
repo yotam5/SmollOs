@@ -9,7 +9,6 @@
 #include "../memory/paging/paging.h"
 #include "../loader/formats/elf/elfloader.h"
 #include <stdbool.h>
-#include "../fs/fat/fatfs/ff.h"
 #include "../fs/fat/fatfs/diskio.h"
 
 // The current process that is running
@@ -182,7 +181,7 @@ void process_switch_to_any()
 
 static void process_unlink(struct process* process)
 {
-    processes[process->id] = 0x00;
+    processes[process->pid] = 0x00;
 
     if (current_process == process)
     {
@@ -505,10 +504,10 @@ int process_load_for_slot(const char* filename, struct process** process, int pr
         res = -ENOMEM;
         goto out;
     }
-
+    
     strncpy(_process->filename, filename, sizeof(_process->filename));
     _process->stack = program_stack_ptr;
-    _process->id = process_slot;
+    _process->pid = process_slot;
 
     // Create a task
     task = task_new(_process);

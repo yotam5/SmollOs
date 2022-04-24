@@ -23,6 +23,8 @@ global smollos_closedir: function
 global smollos_freaddir: function
 global smollos_funlink: function
 global smollos_frename: function
+global smollos_spawnp: function
+
 extern _fini
 
 ; void print(const char* filename)
@@ -265,6 +267,17 @@ smollos_frename:
     push dword[ebp+12]
     push dword[ebp+8]
     mov eax,21
+    int 0x80
+    add esp,8
+    pop ebp
+    ret
+
+;int smollos_spwnp(const char* filename)
+smollos_spawnp:
+    push ebp
+    mov ebp,esp
+    push dword[ebp+8]
+    mov eax,23
     int 0x80
     add esp,8
     pop ebp

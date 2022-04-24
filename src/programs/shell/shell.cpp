@@ -145,6 +145,7 @@ void Shell::parse_command(std::string& cmd,unsigned& y)
       //print("ERROR, no such command");
       break;
     default:
+      print("unknown command in shell\n");
       break;
   }
 }
