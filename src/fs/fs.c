@@ -65,7 +65,7 @@ int fclose(FIL* fd)
 {
 
     f_close(fd);
-    print("file closed\n");
+    //print("file closed\n");
     return 0;
 }
 

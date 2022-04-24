@@ -248,7 +248,7 @@ void kernel_main()
     //char buff[1000];
     //smollos_terminal_readline(buff,sizeof(buff),true);    
     //smollos_getkeyblock();
-    struct process* process = 0;
+    /*struct process* process = 0;
     int res = process_load_switch("/blank.elf", &process);
     if (res != SmollOs_ALL_OK)
     {
@@ -261,7 +261,7 @@ void kernel_main()
     argument.next = 0x00; 
 
     process_inject_arguments(process, &argument);
-    
+    */
     struct command_argument argument2;
     struct process* process2 = 0;
     int res2;

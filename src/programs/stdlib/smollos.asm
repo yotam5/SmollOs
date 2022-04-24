@@ -272,13 +272,13 @@ smollos_frename:
     pop ebp
     ret
 
-;int smollos_spwnp(const char* filename)
+;int smollos_spawnp(const char* filename)
 smollos_spawnp:
     push ebp
     mov ebp,esp
     push dword[ebp+8]
-    mov eax,23
+    mov eax,22
     int 0x80
-    add esp,8
+    add esp,4
     pop ebp
     ret

@@ -85,11 +85,12 @@ void* isr80h_command9_exit(struct interrupt_frame* frame)
     return 0;
 }
 
-void* isr80h_command23_spawnp(struct interrupt_frame* frame)
+void* isr80h_command22_spawnp(struct interrupt_frame* frame)
 {
-    char path[SmollOs_MAX_PATH];
-
-    
-
-    return 0;
+    const char* filename = (const char*)(int)task_get_stack_item(task_current(), 0);
+    char buff[1024];
+    copy_string_from_task(task_current(), filename, buff, sizeof(buff));
+    struct process* p;
+    int res = process_load(buff,&p);
+    return (void*)res;
 }

@@ -50,6 +50,7 @@ int smollos_closedir(DIR* dir);
 int smollos_freaddir(DIR* dir,FILINFO*  fno);
 int smollos_funlink (const char* path);
 int smollos_frename (const TCHAR* path_old, const TCHAR* path_new);
+int smollos_spawnp(const char* filename);
 #ifdef __cplusplus
 // if this is a C++ compiler, we need to close off the extern declaration.
 };

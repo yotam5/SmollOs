@@ -123,7 +123,6 @@ static struct process_allocation* process_get_allocation_by_addr(struct process*
     return 0;
 }
 
-
 int process_terminate_allocations(struct process* process)
 {
     for (int i = 0; i < SmollOs_MAX_PROGRAM_ALLOCATIONS; i++)
