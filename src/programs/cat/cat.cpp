@@ -5,13 +5,14 @@
 
 int main(int argc, char** argv)
 {
-    print("cat run\n");
-    /*FILINFO fno;
-    smollos_fstat(argv[0],&fno);
+    //print("run");
+    print(argv[0]);
+    FILINFO fno;
+    smollos_fstat(argv[1],&fno);
     char* buff = (char*)smollos_malloc(fno.fsize);
-    FIL* fd = smollos_fopen(argv[0], 1);
-    smollos_fread(buff,sizeof(buff),1,fd);
+    FIL* fd = smollos_fopen(argv[1], 1);
+    smollos_fread(buff,fno.fsize,1,fd);
     smollos_fclose(fd);
     print(buff);
-    return 0;*/
+    return 0;
 }

@@ -4,7 +4,8 @@
 #include "../config.h"
 #include "../status.h"
 #include "../string/string.h"
-
+#include "../memory/heap/kheap.h"
+#include "../kernel.h"
 
 void* isr80h_command6_process_load_start(struct interrupt_frame* frame)
 {
@@ -86,12 +87,69 @@ void* isr80h_command9_exit(struct interrupt_frame* frame)
     return 0;
 }
 
+struct command_argument* smollos_parse_command(const char* command, int max)
+{
+    struct command_argument* root_command = 0;
+    char scommand[1025];
+    char* token;
+    struct command_argument* current;
+    if (max >= (int) sizeof(scommand))
+    {
+        return 0;
+    }
+
+
+    strncpy(scommand, command, sizeof(scommand));
+    token = strtok(scommand, " ");
+    if (!token)
+    {
+        goto out;
+    }
+
+    root_command = (struct command_argument*)kzalloc(sizeof(struct command_argument));
+    if (!root_command)
+    {
+        goto out;
+    }
+
+    strncpy(root_command->argument, token, sizeof(root_command->argument));
+    root_command->next = 0;
+
+
+    current = root_command;
+    token = strtok(NULL, " ");
+    while(token != 0)
+    {
+        struct command_argument* new_command = (struct command_argument*)kzalloc(sizeof(struct command_argument));
+        if (!new_command)
+        {
+            break;
+        }
+
+        strncpy(new_command->argument, token, sizeof(new_command->argument));
+        new_command->next = 0x00;
+        current->next = new_command;
+        current = new_command;
+        token = strtok(NULL, " ");
+    }
+out:
+    return root_command;
+}
+
 void* isr80h_command22_spawnp(struct interrupt_frame* frame)
 {
-    const char* filename = (const char*)(int)task_get_stack_item(task_current(), 0);
+    //need to implement arguments command_arg with new etc,
+    //also not to be autistic and do it right so no weird errors happends
+    print("testo\n");
+    const char* filename = (const char*)task_get_stack_item(task_current(), 0);
     char buff[1024];
+    char progname[20];
     copy_string_from_task(task_current(), filename, buff, sizeof(buff));
+    strncpy(progname,filename,sizeof(progname));
     struct process* p;
-    int res = process_load(buff,&p);
+    int res = process_load(strtok(progname,NULL),&p);
+    command_argument* root = smollos_parse_command(buff, sizeof(buff));
+    process_inject_arguments(p, root);
     return (void*)res;
 }
+
