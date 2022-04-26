@@ -122,7 +122,6 @@ void Shell::del(const std::string& path)
 
 void Shell::parse_command(std::string& cmd,unsigned& y)
 { 
-
   int first_space = cmd.find(' ');
   int proglen = cmd.len();
   if(first_space > 0){

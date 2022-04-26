@@ -84,6 +84,7 @@ int process_get_free_slot();
 void process_get_arguments(struct process* process, int* argc, char*** argv);
 int process_inject_arguments(struct process* process, struct command_argument* root_argument);
 int process_terminate(struct process* process);
+void debug_proc();
 #ifdef __cplusplus
 }
 #endif

@@ -262,6 +262,7 @@ void kernel_main()
 
     process_inject_arguments(process, &argument);
     */
+
     struct command_argument argument2;
     struct process* process2 = 0;
     int res2;
@@ -274,7 +275,6 @@ void kernel_main()
     strcpy(argument2.argument, "/hello.txt");
     argument2.next = 0x00; 
     process_inject_arguments(process2, &argument2);
-    
     task_run_first_ever_task();
 
     while(1) {}

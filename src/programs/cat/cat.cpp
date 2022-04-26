@@ -6,7 +6,6 @@
 int main(int argc, char** argv)
 {
     //print("run");
-    print(argv[0]);
     FILINFO fno;
     smollos_fstat(argv[1],&fno);
     char* buff = (char*)smollos_malloc(fno.fsize);

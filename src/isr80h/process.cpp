@@ -140,10 +140,9 @@ void* isr80h_command22_spawnp(struct interrupt_frame* frame)
 {
     //need to implement arguments command_arg with new etc,
     //also not to be autistic and do it right so no weird errors happends
-    print("testo\n");
     const char* filename = (const char*)task_get_stack_item(task_current(), 0);
     char buff[1024];
-    char progname[20];
+    char progname[512];
     copy_string_from_task(task_current(), filename, buff, sizeof(buff));
     strncpy(progname,filename,sizeof(progname));
     struct process* p;

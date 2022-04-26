@@ -8,11 +8,15 @@
 #include "../kernel.h"
 #include "../memory/paging/paging.h"
 #include "../loader/formats/elf/elfloader.h"
+#include <mutex>
 #include <stdbool.h>
 #include "../fs/fat/fatfs/diskio.h"
+#include "./mutex.h"
 
 // The current process that is running
 struct process* current_process = 0;
+
+mutex::Mutex processes_exited_mutex();
 
 static struct process* processes[SmollOs_MAX_PROCESSES] = {};
 
@@ -543,4 +547,13 @@ out:
        // Free the process data
     }
     return res;
+}
+
+void debug_proc()
+{
+    for(int i = 0; i< 11;i++)
+    {
+        print(processes[i]->filename);
+        print("--------");
+    }
 }

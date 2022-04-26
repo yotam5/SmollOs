@@ -200,7 +200,7 @@ string &string::operator+=(const string &s) {
 
 unsigned int string::find(char c) const
 {
-  int i = 0;
+  unsigned i = 0;
   for(;i < this->length;i++)
   {
     if(this->data[i] == c){
@@ -274,7 +274,7 @@ void string::erase(unsigned pos, unsigned count) {
   //1234567
   if(pos + count == this->length - 1)
   {
-    for(int i  = pos;i < pos+count;i++){
+    for(unsigned i  = pos;i < pos+count;i++){
       this->data[i] = '\0';
     }
     this->capacity += count;
