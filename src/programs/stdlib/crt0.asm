@@ -14,6 +14,6 @@ _start:
     call _init
     pop edi
     pop esi
-    call c_start
+    call c_start ;main
     call smollos_exit
     ret

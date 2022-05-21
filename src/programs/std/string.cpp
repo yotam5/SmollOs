@@ -17,6 +17,10 @@ string::string(const int initial) {
   }
 }
 
+/**
+ * @brief clear string data to be empty and init values to 0
+ * 
+ */
 void string::clear()
 {
   memset(this->data,0,this->capacity+this->length);

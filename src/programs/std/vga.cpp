@@ -3,10 +3,21 @@
 #include <stdint.h>
 
 namespace vga {
-Graphics::Graphics(unsigned h, unsigned w) {
+unsigned vga::Graphics::currx = 0;
+unsigned vga::Graphics::curry = 0;
+Graphics::Graphics(unsigned h, unsigned w) 
+{
+  test();
+  print("supposed to work i guess\n");
   this->height = h;
   this->width = w;
   this->videoMemoryStart = (uint16_t *)0xB8000;
+}
+
+void Graphics::test()
+{
+  vga::Graphics::curry = 0;
+  vga::Graphics::currx = 0;
 }
 
 Graphics::Graphics() {
@@ -24,6 +35,7 @@ void Graphics::putStringAt(int x, int y, const std::string &s, Colors color) {
   for (unsigned i = 0; i < s.len(); i++) {
     this->putCharAt(x, y, s[i], color);
     ++x;
+    ++vga::Graphics::currx;
   }
 }
 
@@ -32,8 +44,29 @@ int Graphics::putStringAt(int x,int y, const char* buff,Colors color)
   for(unsigned i = 0; buff[i] != '\0';i++){
     this->putCharAt(x, y, buff[i],color);
     ++x;
+    ++vga::Graphics::currx;
   }
   return x;
+}
+
+void Graphics::putStringAtCurr(const std::string &s, Colors color)
+{
+  for (unsigned i = 0; i < s.len(); i++) {
+    this->putCharAt(vga::Graphics::currx, vga::Graphics::curry, s[i], color);
+    ++vga::Graphics::currx;
+  }
+}
+
+void Graphics::putStringAtCurr(const char* buff, Colors color)
+{
+  for (unsigned i = 0; buff[i] != '\0'; i++) {
+    this->putCharAt(vga::Graphics::currx, vga::Graphics::curry, buff[i], color);
+  ++vga::Graphics::currx;
+    }
+}
+
+void Graphics::downLine()
+{
 }
 
 void Graphics::cls() {
@@ -59,3 +92,4 @@ unsigned Graphics::getWidth() const { return this->width; }
 
 Graphics::~Graphics() {}
 } // namespace vga
+

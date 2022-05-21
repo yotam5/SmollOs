@@ -124,6 +124,7 @@ smollos_exit:
     pop ebp
     ret
 
+
 ;int user_putchar(uint16_t x, uint16_t y, uint16_t c);
 user_putchar:
     push ebp

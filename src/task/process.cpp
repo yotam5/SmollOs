@@ -8,7 +8,6 @@
 #include "../kernel.h"
 #include "../memory/paging/paging.h"
 #include "../loader/formats/elf/elfloader.h"
-#include <mutex>
 #include <stdbool.h>
 #include "../fs/fat/fatfs/diskio.h"
 #include "./mutex.h"

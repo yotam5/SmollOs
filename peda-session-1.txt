@@ -1,6 +1,0 @@
-break *0x400000
-break blank.cpp:27
-break shell.cpp:72
-break shell.cpp:60
-break shell.cpp:61
-

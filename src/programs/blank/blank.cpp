@@ -10,6 +10,7 @@ int main(int argc, char** argv)
     //struct process_arguments arguments;
     //smollos_process_get_arguments(&arguments);
     //print("called ok\n");
+    print("Blank.elf was called\n");
     while(true)
     {
         
